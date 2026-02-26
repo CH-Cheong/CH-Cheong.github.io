@@ -56,25 +56,127 @@
   </div>
 
 <script>
-async function loadTextFile(url, targetId, tagLabel) {
-  const response = await fetch(url);
-  const text = await response.text();
-  const lines = text.split("\n").filter(line => line.trim() !== "");
+async function loadTrends(url, targetId) {
+  const res = await fetch(url, { cache: "no-store" });
+  const text = await res.text();
+  const lines = text.split("\n").map(s => s.trim()).filter(Boolean);
 
-  const container = document.getElementById(targetId);
+  const root = document.getElementById(targetId);
+  root.innerHTML = "";
+
+  let currentItem = null;      // 마지막으로 만든 박스(item)
+  let currentList = null;      // currentItem 안의 ul
+
+  function ensureList() {
+    if (!currentItem) return null;
+    if (!currentList) {
+      currentList = document.createElement("ul");
+      currentList.style.margin = "8px 0 0 18px";
+      currentList.style.padding = "0";
+      currentList.style.color = "var(--muted)";
+      currentList.style.fontSize = "12px";
+      currentList.style.lineHeight = "1.7";
+      currentItem.appendChild(currentList);
+    }
+    return currentList;
+  }
 
   lines.forEach(line => {
+    // 하위항목: "- " 로 시작 → 박스 만들지 않고 ul/li로 추가
+    if (line.startsWith("- ")) {
+      const ul = ensureList();
+      if (!ul) return;
+      const li = document.createElement("li");
+      li.textContent = line.slice(2).trim();
+      ul.appendChild(li);
+      return;
+    }
+
+    // 상위항목: 박스 생성
+    currentItem = document.createElement("div");
+    currentItem.className = "item";
+    currentItem.innerHTML = `
+      <div class="it">
+        <div>${line}</div>
+        <span class="tag">trend</span>
+      </div>
+    `;
+    root.appendChild(currentItem);
+
+    // 새 박스가 생기면 리스트 컨텍스트 초기화
+    currentList = null;
+  });
+}
+
+async function loadPapers(url, targetId) {
+  const res = await fetch(url, { cache: "no-store" });
+  const text = await res.text();
+  const lines = text.split("\n").map(s => s.trim()).filter(Boolean);
+
+  const root = document.getElementById(targetId);
+  root.innerHTML = "";
+
+  // papers에서 숫자 시작 줄은 "박스 없이" 리스트로 모아 출력
+  let list = document.createElement("ol");
+  list.style.margin = "6px 0 0 18px";
+  list.style.padding = "0";
+  list.style.color = "var(--muted)";
+  list.style.fontSize = "12px";
+  list.style.lineHeight = "1.7";
+
+  let hasListItems = false;
+
+  function flushListIfNeeded() {
+    if (hasListItems) root.appendChild(list);
+    list = document.createElement("ol");
+    list.style.margin = "6px 0 0 18px";
+    list.style.padding = "0";
+    list.style.color = "var(--muted)";
+    list.style.fontSize = "12px";
+    list.style.lineHeight = "1.7";
+    hasListItems = false;
+  }
+
+  const isNumberLine = (s) => {
+    // 1) "1. ..." "12. ..." 형태
+    if (/^\d+\.\s+/.test(s)) return true;
+    // 2) "01 ..." "1 ..." 처럼 숫자+공백
+    if (/^\d+\s+/.test(s)) return true;
+    return false;
+  };
+
+  lines.forEach(line => {
+    if (isNumberLine(line)) {
+      const li = document.createElement("li");
+      // 앞 번호는 유지 (원하면 제거도 가능)
+      li.textContent = line;
+      list.appendChild(li);
+      hasListItems = true;
+      return;
+    }
+
+    // 숫자 리스트가 쌓여 있었다면 먼저 출력
+    flushListIfNeeded();
+
+    // 일반 줄은 박스 생성
     const item = document.createElement("div");
     item.className = "item";
     item.innerHTML = `
       <div class="it">
         <div>${line}</div>
-        <span class="tag">${tagLabel}</span>
+        <span class="tag">paper</span>
       </div>
     `;
-    container.appendChild(item);
+    root.appendChild(item);
   });
+
+  // 마지막 리스트 남아 있으면 출력
+  flushListIfNeeded();
 }
+
+loadTrends("/data/trends.txt", "trends-content");
+loadPapers("/data/papers.txt", "papers-content");
+</script>
 
 loadTextFile("data/trends.txt", "trends-content", "trend");
 loadTextFile("data/papers.txt", "papers-content", "paper");
