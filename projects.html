@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CH Cheong | Projects</title>
+  <style>
+    :root{--bg:#0b0f14;--text:#e8eef6;--muted:#9fb0c4;--line:#1b2a3a}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:980px;margin:0 auto;padding:34px 18px 70px}
+    header{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-end}
+    .h1{font-size:20px;font-weight:800}
+    .sub{color:var(--muted);font-size:12px;line-height:1.6}
+    .nav{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px}
+    .btn:hover{background:rgba(255,255,255,.06)}
+    .card{border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:16px;padding:16px;margin-top:14px}
+    h2{margin:0 0 10px;font-size:14px}
+    .muted{color:var(--muted);font-size:12px;line-height:1.7}
+    .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:rgba(0,0,0,.10)}
+    .it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .tag{color:var(--muted);font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+    footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="h1">Projects</div>
+        <div class="sub">프로젝트는 “한 문단 + 3개 불릿”까지만.</div>
+      </div>
+      <div class="nav">
+        <a class="btn" href="index.html">Cover</a>
+        <a class="btn" href="home.html">Home</a>
+        <a class="btn" href="lecture.html">Lecture</a>
+        <a class="btn" href="trends.html">Trends</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>LLM Benchmark — Building Environment Q/A</h2>
+      <div class="muted">
+        건축환경 도메인에서 LLM 성능을 체계적으로 비교하기 위한 평가 프레임워크를 설계합니다.
+      </div>
+      <div class="item">
+        <div class="it"><div>Key points</div><span class="tag">ongoing</span></div>
+        <div class="muted">- core/extended 지표 분리</div>
+        <div class="muted">- 평가 루브릭 및 합의 기반 기준</div>
+        <div class="muted">- 온디바이스 LLM 실험</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Lecture pipeline — PPT → Script → Audio</h2>
+      <div class="muted">
+        강의 제작을 자동화하여 “반복 가능한 제작 파이프라인”으로 만듭니다.
+      </div>
+      <div class="item">
+        <div class="it"><div>Key points</div><span class="tag">pipeline</span></div>
+        <div class="muted">- 페이지 분할 및 스크립트 규칙</div>
+        <div class="muted">- TTS/오디오 생성 워크플로우</div>
+        <div class="muted">- 품질 점검 최소화, 운영 최적화</div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© CH-Cheong</div>
+      <div>Minimal disclosure · High trust</div>
+    </footer>
+  </div>
+</body>
+</html>
