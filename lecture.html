@@ -16,22 +16,43 @@
     .nav{display:flex;gap:10px;flex-wrap:wrap}
     .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px}
     .btn:hover{background:rgba(255,255,255,.06)}
-    .card{border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:16px;padding:16px;margin-top:14px}
-    h2{margin:0 0 10px;font-size:14px}
-    .muted{color:var(--muted);font-size:12px;line-height:1.7}
-    .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:rgba(0,0,0,.10)}
-    .it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .tag{color:var(--muted);font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
-    audio{width:100%;margin-top:8px}
+    .board{margin-top:14px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.02)}
+    .row{
+      display:grid;
+      grid-template-columns: 110px 1fr 90px;
+      gap:12px;
+      padding:12px 14px;
+      border-top:1px solid var(--line);
+      align-items:center;
+    }
+    .row:first-child{border-top:none}
+    .date{color:var(--muted);font-size:12px}
+    .title{font-size:13px;font-weight:700;line-height:1.4}
+    .meta{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
+    .tag{
+      justify-self:end;
+      color:var(--muted);
+      font-size:11px;
+      border:1px solid var(--line);
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(0,0,0,.10);
+    }
+    .row:hover{background:rgba(255,255,255,.03)}
+    .hint{margin-top:10px;color:var(--muted);font-size:12px}
     footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    @media (max-width:760px){
+      .row{grid-template-columns: 1fr; gap:6px}
+      .tag{justify-self:start}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div>
-        <div class="h1">Lecture / Audio Archive</div>
-        <div class="sub">과목/주차별로 MP3를 정리합니다. (텍스트 최소)</div>
+        <div class="h1">Lecture / Board</div>
+        <div class="sub">형이 항목만 추가하면 자동으로 게시판처럼 쌓이는 구조</div>
       </div>
       <div class="nav">
         <a class="btn" href="index.html">Cover</a>
@@ -41,39 +62,39 @@
       </div>
     </header>
 
-    <section class="card">
-      <h2>건축설비</h2>
-      <div class="muted">예: week01.mp3 같은 규칙으로 올려도 되고, 제목 그대로 써도 됨.</div>
+    <div class="board">
 
-      <div class="item">
-        <div class="it">
-          <div>Week 06 — HVAC & Heating (sample)</div>
-          <span class="tag">mp3</span>
-        </div>
-        <audio controls preload="none">
-          <source src="audio/building-equipment/week06.mp3" type="audio/mpeg" />
-        </audio>
-        <div class="muted">파일 경로 예시: <b>audio/building-equipment/week06.mp3</b></div>
-      </div>
-    </section>
+      <!-- ✅ 아래 “row 블록”만 복붙해서 계속 추가하면 됨 -->
 
-    <section class="card">
-      <h2>건강과 건축환경</h2>
-      <div class="item">
-        <div class="it">
-          <div>Lecture 05 — 실내공기질과 건강 (sample)</div>
-          <span class="tag">mp3</span>
+      <a class="row" href="https://YOUR_LINK_HERE" target="_blank" rel="noopener">
+        <div class="date">2026-02-26</div>
+        <div>
+          <div class="title">건축설비 / 6강 — HVAC & Heating</div>
+          <div class="meta">키워드: 난방 방식, 라디에이터, 증기/온수 시스템</div>
         </div>
-        <audio controls preload="none">
-          <source src="audio/health-built-env/lec05.mp3" type="audio/mpeg" />
-        </audio>
-        <div class="muted">파일 경로 예시: <b>audio/health-built-env/lec05.mp3</b></div>
-      </div>
-    </section>
+        <div class="tag">audio</div>
+      </a>
+
+      <a class="row" href="https://YOUR_LINK_HERE" target="_blank" rel="noopener">
+        <div class="date">2026-02-24</div>
+        <div>
+          <div class="title">AI 연구방법론 — LLM 활용 주의사항</div>
+          <div class="meta">키워드: 환각, 레퍼런스 검증, 재현성</div>
+        </div>
+        <div class="tag">note</div>
+      </a>
+
+      <!-- ✅ row 끝 -->
+
+    </div>
+
+    <div class="hint">
+      추가 방법: 위 <b>row</b> 한 덩어리 복사 → 날짜/제목/키워드/링크만 바꾸기 → Commit
+    </div>
 
     <footer>
       <div>© CH-Cheong</div>
-      <div>Text-first · Audio-first</div>
+      <div>Text-first · Simple ops</div>
     </footer>
   </div>
 </body>
