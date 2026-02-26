@@ -140,14 +140,15 @@
     }
 
     lines.forEach(line => {
-      if (isNumberLine(line)) {
-        startListIfNeeded();
+      if (/^\-\s*/.test(line)) {
+        const ul = ensureList();
+        if (!ul) return;
         const li = document.createElement("li");
-        li.textContent = line;
-        list.appendChild(li);
+        li.textContent = line.replace(/^\-\s*/, "").trim();
+        ul.appendChild(li);
         return;
       }
-
+ 
       // 숫자 리스트 구간 종료
       endList();
 
