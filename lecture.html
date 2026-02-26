@@ -16,7 +16,48 @@
     .nav{display:flex;gap:10px;flex-wrap:wrap}
     .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px}
     .btn:hover{background:rgba(255,255,255,.06)}
-    .board{margin-top:14px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.02)}
+
+    .player{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(255,255,255,.02);
+    }
+    .playerHead{
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      padding:12px 14px; border-bottom:1px solid var(--line);
+      align-items:center;
+    }
+    .nowTitle{font-size:13px;font-weight:700}
+    .nowMeta{color:var(--muted);font-size:12px}
+    .note{
+      padding:10px 14px;
+      color:var(--muted);
+      font-size:12px;
+      border-bottom:1px solid var(--line);
+    }
+
+    /* 16:9 responsive iframe */
+    .frame{
+      position:relative;
+      width:100%;
+      padding-top:56.25%;
+      background:#000;
+    }
+    .frame iframe{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      border:0;
+    }
+
+    .board{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(255,255,255,.02);
+    }
     .row{
       display:grid;
       grid-template-columns: 110px 1fr 90px;
@@ -24,6 +65,8 @@
       padding:12px 14px;
       border-top:1px solid var(--line);
       align-items:center;
+      cursor:pointer;
+      user-select:none;
     }
     .row:first-child{border-top:none}
     .date{color:var(--muted);font-size:12px}
@@ -39,8 +82,15 @@
       background:rgba(0,0,0,.10);
     }
     .row:hover{background:rgba(255,255,255,.03)}
-    .hint{margin-top:10px;color:var(--muted);font-size:12px}
+    .row.active{
+      background:rgba(255,255,255,.05);
+      outline:1px solid rgba(255,255,255,.08);
+      outline-offset:-1px;
+    }
+    .hint{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.7}
+    .kbd{border:1px solid var(--line);border-radius:8px;padding:2px 8px;color:var(--muted)}
     footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
     @media (max-width:760px){
       .row{grid-template-columns: 1fr; gap:6px}
       .tag{justify-self:start}
@@ -51,8 +101,8 @@
   <div class="wrap">
     <header>
       <div>
-        <div class="h1">Lecture / Board</div>
-        <div class="sub">형이 항목만 추가하면 자동으로 게시판처럼 쌓이는 구조</div>
+        <div class="h1">Lecture / YouTube Playlist</div>
+        <div class="sub">목록 클릭 → 아래 플레이어에서 바로 재생</div>
       </div>
       <div class="nav">
         <a class="btn" href="index.html">Cover</a>
@@ -62,40 +112,114 @@
       </div>
     </header>
 
-    <div class="board">
+    <!-- Player -->
+    <section class="player" aria-label="Lecture Player">
+      <div class="playerHead">
+        <div>
+          <div class="nowTitle" id="nowTitle">Select a lecture</div>
+          <div class="nowMeta" id="nowMeta">Click an item below to load the video.</div>
+        </div>
+        <a class="btn" id="openYT" href="#" target="_blank" rel="noopener" style="display:none">Open in YouTube</a>
+      </div>
 
-      <!-- ✅ 아래 “row 블록”만 복붙해서 계속 추가하면 됨 -->
+      <div class="note">
+        안내: AI 자동생성 대화로 내용 상 오류가 있을 수 있습니다.
+      </div>
 
-      <a class="row" href="https://YOUR_LINK_HERE" target="_blank" rel="noopener">
+      <div class="frame">
+        <iframe
+          id="ytPlayer"
+          src="https://www.youtube.com/embed/?rel=0"
+          title="YouTube player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- Board -->
+    <section class="board" aria-label="Lecture Board" id="board">
+
+      <!-- ✅ 사용법:
+           1) 아래 row 블록 복붙
+           2) data-vid="유튜브 VIDEO_ID" 만 바꾸면 됨
+           3) 날짜/제목/키워드도 수정
+      -->
+
+      <div class="row active"
+           data-vid="dQw4w9WgXcQ"
+           data-title="건축설비 / 6강 — HVAC & Heating (sample)"
+           data-meta="키워드: 난방 방식, 라디에이터, 증기/온수 시스템">
         <div class="date">2026-02-26</div>
         <div>
-          <div class="title">건축설비 / 6강 — HVAC & Heating</div>
+          <div class="title">건축설비 / 6강 — HVAC & Heating (sample)</div>
           <div class="meta">키워드: 난방 방식, 라디에이터, 증기/온수 시스템</div>
         </div>
-        <div class="tag">audio</div>
-      </a>
+        <div class="tag">youtube</div>
+      </div>
 
-      <a class="row" href="https://YOUR_LINK_HERE" target="_blank" rel="noopener">
+      <div class="row"
+           data-vid="VIDEO_ID_HERE"
+           data-title="AI 연구방법론 — LLM 활용 주의사항 (sample)"
+           data-meta="키워드: 환각, 레퍼런스 검증, 재현성">
         <div class="date">2026-02-24</div>
         <div>
-          <div class="title">AI 연구방법론 — LLM 활용 주의사항</div>
+          <div class="title">AI 연구방법론 — LLM 활용 주의사항 (sample)</div>
           <div class="meta">키워드: 환각, 레퍼런스 검증, 재현성</div>
         </div>
-        <div class="tag">note</div>
-      </a>
+        <div class="tag">youtube</div>
+      </div>
 
-      <!-- ✅ row 끝 -->
-
-    </div>
+    </section>
 
     <div class="hint">
-      추가 방법: 위 <b>row</b> 한 덩어리 복사 → 날짜/제목/키워드/링크만 바꾸기 → Commit
+      유튜브 링크가 이런 형태라면<br/>
+      <span class="kbd">https://www.youtube.com/watch?v=VIDEO_ID</span><br/>
+      <b>VIDEO_ID</b>만 복사해서 <span class="kbd">data-vid</span>에 넣으면 됩니다.
     </div>
 
     <footer>
       <div>© CH-Cheong</div>
-      <div>Text-first · Simple ops</div>
+      <div>Text-first · Video-backed</div>
     </footer>
   </div>
+
+  <script>
+    // === minimal player controller ===
+    const rows = Array.from(document.querySelectorAll(".row"));
+    const player = document.getElementById("ytPlayer");
+    const nowTitle = document.getElementById("nowTitle");
+    const nowMeta = document.getElementById("nowMeta");
+    const openYT = document.getElementById("openYT");
+
+    function loadVideo(row){
+      const vid = row.dataset.vid;
+      const title = row.dataset.title || "Lecture";
+      const meta = row.dataset.meta || "";
+
+      // update UI
+      rows.forEach(r => r.classList.remove("active"));
+      row.classList.add("active");
+
+      nowTitle.textContent = title;
+      nowMeta.textContent = meta;
+
+      // set iframe src (autoplay=1 to start immediately)
+      if(vid && vid !== "VIDEO_ID_HERE"){
+        player.src = `https://www.youtube.com/embed/${vid}?rel=0&autoplay=1`;
+        openYT.href = `https://www.youtube.com/watch?v=${vid}`;
+        openYT.style.display = "inline-flex";
+      }else{
+        player.src = `https://www.youtube.com/embed/?rel=0`;
+        openYT.href = "#";
+        openYT.style.display = "none";
+      }
+    }
+
+    rows.forEach(r => r.addEventListener("click", () => loadVideo(r)));
+
+    // auto-load first row if it has a valid vid
+    if(rows.length) loadVideo(rows[0]);
+  </script>
 </body>
 </html>
