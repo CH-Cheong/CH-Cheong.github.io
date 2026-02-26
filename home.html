@@ -1,112 +1,29 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CH Cheong | Home</title>
-  <style>
-    :root{--bg:#0b0f14;--card:#0f1621;--text:#e8eef6;--muted:#9fb0c4;--line:#1b2a3a}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:980px;margin:0 auto;padding:34px 18px 70px}
-    header{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-end}
-    .h1{font-size:20px;font-weight:800}
-    .sub{color:var(--muted);font-size:12px;line-height:1.6}
-    .nav{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px}
-    .btn:hover{background:rgba(255,255,255,.06)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-    @media (max-width:860px){.grid{grid-template-columns:1fr}}
-    .card{border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:16px;padding:16px}
-    h2{margin:0 0 10px;font-size:14px}
-    .muted{color:var(--muted);font-size:12px;line-height:1.7}
-    .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:rgba(0,0,0,.10)}
-    .it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .tag{color:var(--muted);font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
-    audio{width:100%;margin-top:8px}
-    footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div>
-        <div class="h1">CH Cheong / Home</div>
-        <div class="sub">AI-driven Sustainable Building Environment Research</div>
-      </div>
-      <div class="nav">
-        <a class="btn" href="index.html">← Cover</a>
-        <a class="btn" href="lecture.html">Lecture</a>
-        <a class="btn" href="trends.html">Trends</a>
-        <a class="btn" href="projects.html">Projects</a>
-      </div>
-    </header>
+<section class="card">
+  <h2>About</h2>
 
-    <div class="grid">
-      <section class="card" id="lecture">
-        <h2>Lecture Audio</h2>
-        <div class="muted">MP3 업로드 후 파일명만 맞추면 바로 재생됩니다.</div>
+  <p class="muted" style="margin-top:8px; line-height:1.8;">
+    I conduct independent research at the intersection of 
+    <strong>Building Energy Systems</strong> and 
+    <strong>Indoor Environmental Quality</strong>, 
+    with a growing focus on the integration of 
+    <strong>Artificial Intelligence</strong> in the built environment domain.
+  </p>
 
-        <div class="item">
-          <div class="it">
-            <div>Lecture 01 — Sample</div>
-            <span class="tag">mp3</span>
-          </div>
-          <audio controls preload="none">
-            <source src="lecture1.mp3" type="audio/mpeg" />
-          </audio>
-          <div class="muted">파일명 예: <b>lecture1.mp3</b> (저장소 루트에 업로드)</div>
-        </div>
-      </section>
+  <p class="muted" style="margin-top:10px; line-height:1.8;">
+    My current interests include:
+    <br>• AI-driven building environmental research
+    <br>• Health, comfort, and quality of life in built spaces
+    <br>• Machine learning applications in architecture
+    <br>• Large Language Models (LLMs) for domain-specific knowledge and evaluation
+  </p>
 
-      <section class="card" id="trends">
-        <h2>Research Trends</h2>
-        <div class="muted">짧게: 핵심 1줄 + 설계/운영 관점 메모.</div>
+  <p class="muted" style="margin-top:10px; line-height:1.8;">
+    I am particularly interested in leveraging AI as an 
+    independent research engine — designing workflows, 
+    benchmarks, and automated pipelines for knowledge production.
+  </p>
 
-        <div class="item">
-          <div class="it">
-            <div>2026-02 — Indoor heat stress</div>
-            <span class="tag">note</span>
-          </div>
-          <div class="muted">요약: (한 줄만)</div>
-        </div>
-
-        <div class="item">
-          <div class="it">
-            <div>2026-02 — LLM reliability</div>
-            <span class="tag">note</span>
-          </div>
-          <div class="muted">요약: (한 줄만)</div>
-        </div>
-      </section>
-    </div>
-
-    <section class="card" id="projects" style="margin-top:14px">
-      <h2>Projects</h2>
-      <div class="muted">재현 가능한 단위로만 기록합니다.</div>
-
-      <div class="item">
-        <div class="it">
-          <div>LLM Benchmark — Building Environment Q/A</div>
-          <span class="tag">ongoing</span>
-        </div>
-        <div class="muted">core/extended 지표, 평가 루브릭, 온디바이스 실험.</div>
-      </div>
-
-      <div class="item">
-        <div class="it">
-          <div>Lecture pipeline — PPT → Script → Audio</div>
-          <span class="tag">pipeline</span>
-        </div>
-        <div class="muted">자동 분할, 스크립트 규칙, 음성 생성 워크플로우.</div>
-      </div>
-    </section>
-
-    <footer>
-      <div>© CH-Cheong</div>
-      <div>Minimal · Text-first · No noise</div>
-    </footer>
-  </div>
-</body>
-</html>
+  <p class="muted" style="margin-top:14px;">
+    Contact: <a href="mailto:changheon@gnu.ac.kr">changheon@gnu.ac.kr</a>
+  </p>
+</section>
