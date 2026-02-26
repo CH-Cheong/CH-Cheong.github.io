@@ -31,7 +31,7 @@
     <header>
       <div>
         <div class="h1">Trends / Research Notes</div>
-        <div class="sub">규칙: 핵심 1줄 + (설계/운영 관점) 1줄. 과장 금지.</div>
+        <div class="sub">.</div>
       </div>
       <div class="nav">
         <a class="btn" href="index.html">Cover</a>
@@ -42,25 +42,11 @@
     </header>
 
     <section class="card">
-      <h2>2026-02</h2>
+      <h2>Research Trends</h2>
+      <div id="trends-content"></div>
 
-      <div class="item">
-        <div class="it">
-          <div>Indoor heat stress & vulnerable groups</div>
-          <span class="tag">heat</span>
-        </div>
-        <div class="one">핵심: (여기에 1줄)</div>
-        <div class="one">설계/운영: (여기에 1줄)</div>
-      </div>
-
-      <div class="item">
-        <div class="it">
-          <div>LLM reliability in domain QA</div>
-          <span class="tag">llm</span>
-        </div>
-        <div class="one">핵심: (여기에 1줄)</div>
-        <div class="one">설계/운영: (여기에 1줄)</div>
-      </div>
+      <h2 style="margin-top:20px;">Publications</h2>
+      <div id="papers-content"></div>
     </section>
 
     <footer>
@@ -68,5 +54,31 @@
       <div>Short notes · High signal</div>
     </footer>
   </div>
+
+<script>
+async function loadTextFile(url, targetId, tagLabel) {
+  const response = await fetch(url);
+  const text = await response.text();
+  const lines = text.split("\n").filter(line => line.trim() !== "");
+
+  const container = document.getElementById(targetId);
+
+  lines.forEach(line => {
+    const item = document.createElement("div");
+    item.className = "item";
+    item.innerHTML = `
+      <div class="it">
+        <div>${line}</div>
+        <span class="tag">${tagLabel}</span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+loadTextFile("data/trends.txt", "trends-content", "trend");
+loadTextFile("data/papers.txt", "papers-content", "paper");
+</script>
+
 </body>
 </html>
