@@ -22,7 +22,6 @@
     .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:rgba(0,0,0,.10)}
     .it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .tag{color:var(--muted);font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
-    .one{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.7}
     footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   </style>
 </head>
@@ -59,7 +58,13 @@
   async function loadTrends(url, targetId) {
     const res = await fetch(url, { cache: "no-store" });
     const text = await res.text();
-    const lines = text.split("\n").map(s => s.trim()).filter(Boolean);
+
+    // BOM 제거 + 줄 정리
+    const lines = text
+      .replace(/^\uFEFF/, "")
+      .split("\n")
+      .map(s => s.trim())
+      .filter(Boolean);
 
     const root = document.getElementById(targetId);
     root.innerHTML = "";
@@ -81,13 +86,15 @@
       return currentList;
     }
 
-    lines.forEach(line => {
-      // 하위항목: "- " 로 시작 → 박스 만들지 않고 ul/li로 추가
-      if (line.startsWith("- ")) {
+    lines.forEach(rawLine => {
+      const line = rawLine.replace(/^\uFEFF/, "").trim();
+
+      // 하위항목: "-" 로 시작(공백 유무 무관) → 박스 만들지 않고 ul/li로 추가
+      if (/^\-\s*/.test(line)) {
         const ul = ensureList();
         if (!ul) return;
         const li = document.createElement("li");
-        li.textContent = line.slice(2).trim();
+        li.textContent = line.replace(/^\-\s*/, "").trim();
         ul.appendChild(li);
         return;
       }
@@ -111,20 +118,22 @@
   async function loadPapers(url, targetId) {
     const res = await fetch(url, { cache: "no-store" });
     const text = await res.text();
-    const lines = text.split("\n").map(s => s.trim()).filter(Boolean);
+
+    // BOM 제거 + 줄 정리
+    const lines = text
+      .replace(/^\uFEFF/, "")
+      .split("\n")
+      .map(s => s.trim())
+      .filter(Boolean);
 
     const root = document.getElementById(targetId);
     root.innerHTML = "";
 
-    const isNumberLine = (s) => {
-      // "1. ..." "12. ..."
-      if (/^\d+\.\s+/.test(s)) return true;
-      // "01 ..." "1 ..." (숫자 + 공백)
-      if (/^\d+\s+/.test(s)) return true;
-      return false;
-    };
+    // 숫자 라인 판별: "1. ", "1.", "1, ", "1," 등 폭넓게 허용
+    const isNumberLine = (s) => /^\d+\s*[\.\,]\s*/.test(s) || /^\d+\s+/.test(s);
 
     let list = null;
+
     function startListIfNeeded() {
       if (list) return;
       list = document.createElement("ol");
@@ -135,24 +144,30 @@
       list.style.lineHeight = "1.7";
       root.appendChild(list);
     }
+
     function endList() {
       list = null;
     }
 
-    lines.forEach(line => {
-      if (/^\-\s*/.test(line)) {
-        const ul = ensureList();
-        if (!ul) return;
+    lines.forEach(rawLine => {
+      const line = rawLine.replace(/^\uFEFF/, "").trim();
+
+      // 번호 항목은 박스 없이 <ol>에 들어감
+      if (isNumberLine(line)) {
+        startListIfNeeded();
         const li = document.createElement("li");
-        li.textContent = line.replace(/^\-\s*/, "").trim();
-        ul.appendChild(li);
+
+        // 텍스트에 붙어있는 "1." / "1," 제거 (중복 번호 방지)
+        li.textContent = line.replace(/^\d+\s*[\.\,]\s*/, "").trim();
+
+        list.appendChild(li);
         return;
       }
- 
-      // 숫자 리스트 구간 종료
+
+      // 번호 리스트 구간 종료
       endList();
 
-      // 일반 줄은 박스 생성
+      // 일반 줄은 박스(item)로 표시 (예: * 주석/설명 줄)
       const item = document.createElement("div");
       item.className = "item";
       item.innerHTML = `
