@@ -1,54 +1,57 @@
-1,국제전문학술지(SCI급),202511,온디바이스 대형언어모델 엑사원 4.0 1.2B가 자동생성한 건축환경문헌 기반 Q&A 데이터셋의 품질평가,SCOPUS,대한건축학회논문집
-2,국제전문학술지(SCI급),202507,Possibility of Improving Comfortable Ventilation in Single-Occupancy Modular Units,SCOPUS,Journal of the Architectural Institute of Korea
-3,국제전문학술지(SCI급),202506,Development of a Framework for Evaluating Healing Environments Through a Review of Korean Research Literature,SCOPUS,Journal of the Architectural Institute of Korea
-4,국내전문학술지(KCI급),202504,진주시 건물 에너지 소비량 감축 방안에 관한 고찰,,한국생활환경학회지
-5,국내전문학술지(KCI급),202412,Exploratory Survey on Parents’ Perceptions of Elementary School Operation and Facility Improvement in Pandemic Circumstances,,Architectural Research
-6,국제전문학술지(SCI급),202405,Assessing the Accuracy of Energy Consumption Prediction Models for Elementary Schools Through Classroom-based Group Segmentation,SCOPUS,Journal of the Architectural Institute of Korea
-7,국내전문학술지(KCI급),202404,감염자 행동 시나리오와 Wells-Riley Equation를 이용한 감염재생산지수 예측 가능성에 대한 탐색적 연구,,한국건축친환경설비학회 논문집
-8,국내전문학술지(KCI급),202312,환기량 및 감염자 분리시점이 초등학교 내 공기전파감염확률에 미치는 영향 분석,,한국건축친환경설비학회 논문집
-9,국내전문학술지(KCI급),202304,초등학교 학급 수를 이용한 연간 에너지소비량 모델 구축에 대한 탐색적 연구,,한국생활환경학회지
-10,국제전문학술지(SCI급),202303,Ventilation methods to prevent the spread of airborne pathogens from teachers to students,SCOPUS,International Journal of Air-Conditioning and Refrigeration
-11,국내전문학술지(KCI급),202302,Combination of Mechanical Ventilation and Ceiling Fin to Reduce Airborne Infection Risk,,한국생활환경학회지
-12,국제전문학술지(SCI급),202301,Effects of microencapsulated phase change material on indoor thermal comfort and energy consumption,SCIE,CASE STUDIES IN THERMAL ENGINEERING
-13,국내전문학술지(KCI급),202208,소규모 식당의 배기방식에 따른 실내 공기전파감염원 확산 양상 분석,,한국건축친환경설비학회 논문집
-14,국내전문학술지(KCI급),202206,Implementation of Ceiling Fin to Prevent the Spread of Airborne Pathogens by Buoyancy Effect,,한국생활환경학회지
-15,국내전문학술지(KCI급),202204,초등학교 교실 내 공기전파감염원과 미세먼지 농도를 고려한 실내 공기질 관리 방법 분석,,한국건축친환경설비학회 논문집
-16,국제전문학술지(SCI급),202112,Effect of under-floor air distribution system to prevent the spread of airborne pathogens in classrooms,SCIE,CASE STUDIES IN THERMAL ENGINEERING
-17,국내전문학술지(KCI급),202108,COVID-19 유행 중 부산·경남 지역 초등학교 운영실태 조사 분석,,한국생활환경학회지
-18,국내전문학술지(KCI급),202108,Wells-Riley 식을 활용한 초등학교 내 공기전파감염관리 항목의 적용 우선순위 분석,,한국건축친환경설비학회 논문집
-19,국내전문학술지(KCI급),202102,실측을 통한 일개 대학 전산실의 미세먼지 농도특성 분석,,한국건축친환경설비학회 논문집
-20,국제전문학술지(SCI급),202101,University students’ perceptions of airborne infection control: exploratory study using Q methodology,SCIE,BMC PUBLIC HEALTH
-21,국내전문학술지(KCI급),202010,최소 환기 조건의 주거공간에서 인플루엔자 바이러스 단기 노출에 따른 공기전파감염확률 분석,,한국생활환경학회지
-22,국제전문학술지(SCI급),202003,Thermal Comfort Analysis of Combined Radiation-Convection Floor Heating System,SCIE,Energies
-23,국내전문학술지(KCI급),201912,대학생의 정신적 웰빙과 건강캠퍼스 인식간의 관계,,한국생활환경학회지
-24,국내전문학술지(KCI급),201910,구들을 이용한 이동식 찜질시설의 실내 일산화탄소 농도 분석,,한국생활환경학회지
-25,국내전문학술지(KCI급),201908,관가정의 창면적비와 주광률 검토를 통한 자연채광 성능 분석,,한국건축친환경설비학회 논문집
-26,국내전문학술지(KCI급),201906,고열전도 콘크리트를 활용한 저온열원 융설시스템의  전열성능 실험연구,,한국건축친환경설비학회 논문집
-27,국내전문학술지(KCI급),201904,재실 패턴과 재실자 신체적 특징을 고려한 건축물 용도 별 공기전파감염확률 분석,,한국건축친환경설비학회 논문집
-28,국제전문학술지(SCI급),201812,Effect of the Physical Environment on the Health-related Quality of Life of the Low-income Korean Elderly Population,,IRANIAN JOURNAL OF PUBLIC HEALTH
-29,국내전문학술지(KCI급),201810,베이비부머 전후세대의 공동주택 외부환경과 건강관련 삶의 질 지표에 대한 인식 분석,,한국생활환경학회지
-30,국제전문학술지(SCI급),201809,Design Method to Prevent Airborne Infection in an Emergency Department,,JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING
-31,국내전문학술지(KCI급),201806,송엽분과 질석을 포함한 준불연 단열복합보드의 개발,,한국화재소방학회 논문지
-32,국내전문학술지(KCI급),201806,응급실 공기전파감염 위험도와 관련한 의료진의인식에 대한 조사연구,,한국건축친환경설비학회 논문집
-33,국내전문학술지(KCI급),201804,공기전파감염확률 영향인자에 대한 매개변수 분석,,한국건축친환경설비학회 논문집
-34,국제전문학술지(SCI급),201803,Case Study of Airborne Pathogen Dispersion Patterns in Emergency Departments with Different Ventilation and Partition Conditions,SCI,INTERNATIONAL JOURNAL OF ENVIRONMENTAL RESEARCH AND PUBLIC HEALTH
-35,국내전문학술지(KCI급),201802,경골목구조 벽체의 내화성능확보를 위한 질석보드 개발,,한국화재소방학회 논문지
-36,국내전문학술지(KCI급),201708,Relation between Overall Health Status and Environmental Satisfaction of Community Elders,,한국생활환경학회지
-37,국제전문학술지(SCI급),201705,cooling energy reduction effect of parallel double-window system operation in residential buildings in south korea,SCIE,INDOOR AND BUILT ENVIRONMENT
-38,국내전문학술지(KCI급),201704,PV시스템 적용 공동주택의 에너지 제로화를 위한적정 건축-규모 검토,,한국건축친환경설비학회 논문집
-39,국내전문학술지(KCI급),201702,CFD를 이용한 병실 국부지역의 공기전파감염확률 평가사례,,한국건축친환경설비학회 논문집
-40,국제전문학술지(SCI급),201701,A Modified Energy Evaluation Tool for Residential Complexes in South Korea to Reflect Total Electricity Consumption,SCIE,JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING
-41,국내전문학술지(KCI급),201612,실물실험을 통한 다이나믹 유량밸런싱 적용공동주택 세대의 에너지소비량 평가,,한국지열에너지학회논문집
-42,국내전문학술지(KCI급),201612,외단열 동시타설 공법에서 단열재 부착강도에 관한 연구,,한국건축친환경설비학회 논문집
-43,국내전문학술지(KCI급),201611,공동주택 지하주차장 유공벽의 표면결로방지 기법 검토,,대한건축학회논문집 계획계
-44,국내전문학술지(KCI급),201606,친환경 캠퍼스의 외부공간에 대한 수요자의 선호도 조사,,주거환경
-45,국내전문학술지(KCI급),201606,설계사례 조사를 통한 응급실 내 공기전파감염방지 개선방안,,한국생활환경학회지
-46,국내전문학술지(KCI급),201604,캠퍼스 건축물 기밀성 향상을 통한 냉난방에너지소비량 저감효과 분석,,대한건축학회연합논문집
-47,국내전문학술지(KCI급),201602,거주자의 주거환경 인식에 기반한 진주시 주거건물의에너지 리트로핏 우선순위 검토,,대한건축학회연합논문집
-48,국내전문학술지(KCI급),201602,문헌고찰을 통한 노인요양시설 온열환경의 적정 수준 제안,,한국생활환경학회지
-49,국내전문학술지(KCI급),201512,한국 건물부문 탄소세 도입 방안,,한국건축친환경설비학회 논문집
-50,국내전문학술지(KCI급),201510,공동주택 지하주차장의 시환경 실태에 대한 조사연구,,대한건축학회연합논문집
-51,국내전문학술지(KCI급),201504,단열배수판 시공방법에 따른 지하주차장 바닥슬래브 표면온도 상승효과 해석,,대한건축학회연합논문집
-52,국내전문학술지(KCI급),201504,각형강관을 이용한 벽체용 영구단열거푸집의 표면변위 제어방법,,대한건축학회연합논문집
-53,국제전문학술지(SCI급),201502,Lifecycle CO2 Reduction by Implementing Double Window Casement Systems in Residential Units in Korea,SCIE,Energies
-54,국제전문학술지(SCI급),201410,Thermal and Daylighting Performance of Energy-Efficient Windows in Highly Glazed Residential Buildings: Case Study in Korea,SCIE,Sustainability
+* KCI 홈페이지 기준으로 Scopus급은 SCI급으로 표현됩니다. 
+
+1. 국제전문학술지(SCI급),202511,온디바이스 대형언어모델 엑사원 4.0 1.2B가 자동생성한 건축환경문헌 기반 Q&A 데이터셋의 품질평가,SCOPUS,대한건축학회논문집
+2. 국제전문학술지(SCI급),202507,Possibility of Improving Comfortable Ventilation in Single-Occupancy Modular Units,SCOPUS,Journal of the Architectural Institute of Korea
+3. 국제전문학술지(SCI급),202506,Development of a Framework for Evaluating Healing Environments Through a Review of Korean Research Literature,SCOPUS,Journal of the Architectural Institute of Korea
+4. 국내전문학술지(KCI급),202504,진주시 건물 에너지 소비량 감축 방안에 관한 고찰,,한국생활환경학회지
+5. 국내전문학술지(KCI급),202412,Exploratory Survey on Parents’ Perceptions of Elementary School Operation and Facility Improvement in Pandemic Circumstances,,Architectural Research
+6. 국제전문학술지(SCI급),202405,Assessing the Accuracy of Energy Consumption Prediction Models for Elementary Schools Through Classroom-based Group Segmentation,SCOPUS,Journal of the Architectural Institute of Korea
+7. 국내전문학술지(KCI급),202404,감염자 행동 시나리오와 Wells-Riley Equation를 이용한 감염재생산지수 예측 가능성에 대한 탐색적 연구,,한국건축친환경설비학회 논문집
+8. 국내전문학술지(KCI급),202312,환기량 및 감염자 분리시점이 초등학교 내 공기전파감염확률에 미치는 영향 분석,,한국건축친환경설비학회 논문집
+9. 국내전문학술지(KCI급),202304,초등학교 학급 수를 이용한 연간 에너지소비량 모델 구축에 대한 탐색적 연구,,한국생활환경학회지
+10. 국제전문학술지(SCI급),202303,Ventilation methods to prevent the spread of airborne pathogens from teachers to students,SCOPUS,International Journal of Air-Conditioning and Refrigeration
+11. 국내전문학술지(KCI급),202302,Combination of Mechanical Ventilation and Ceiling Fin to Reduce Airborne Infection Risk,,한국생활환경학회지
+12. 국제전문학술지(SCI급),202301,Effects of microencapsulated phase change material on indoor thermal comfort and energy consumption,SCIE,CASE STUDIES IN THERMAL ENGINEERING
+13. 국내전문학술지(KCI급),202208,소규모 식당의 배기방식에 따른 실내 공기전파감염원 확산 양상 분석,,한국건축친환경설비학회 논문집
+14. 국내전문학술지(KCI급),202206,Implementation of Ceiling Fin to Prevent the Spread of Airborne Pathogens by Buoyancy Effect,,한국생활환경학회지
+15. 국내전문학술지(KCI급),202204,초등학교 교실 내 공기전파감염원과 미세먼지 농도를 고려한 실내 공기질 관리 방법 분석,,한국건축친환경설비학회 논문집
+16. 국제전문학술지(SCI급),202112,Effect of under-floor air distribution system to prevent the spread of airborne pathogens in classrooms,SCIE,CASE STUDIES IN THERMAL ENGINEERING
+17. 국내전문학술지(KCI급),202108,COVID-19 유행 중 부산·경남 지역 초등학교 운영실태 조사 분석,,한국생활환경학회지
+18. 국내전문학술지(KCI급),202108,Wells-Riley 식을 활용한 초등학교 내 공기전파감염관리 항목의 적용 우선순위 분석,,한국건축친환경설비학회 논문집
+19. 국내전문학술지(KCI급),202102,실측을 통한 일개 대학 전산실의 미세먼지 농도특성 분석,,한국건축친환경설비학회 논문집
+20. 국제전문학술지(SCI급),202101,University students’ perceptions of airborne infection control: exploratory study using Q methodology,SCIE,BMC PUBLIC HEALTH
+21. 국내전문학술지(KCI급),202010,최소 환기 조건의 주거공간에서 인플루엔자 바이러스 단기 노출에 따른 공기전파감염확률 분석,,한국생활환경학회지
+22. 국제전문학술지(SCI급),202003,Thermal Comfort Analysis of Combined Radiation-Convection Floor Heating System,SCIE,Energies
+23. 국내전문학술지(KCI급),201912,대학생의 정신적 웰빙과 건강캠퍼스 인식간의 관계,,한국생활환경학회지
+24. 국내전문학술지(KCI급),201910,구들을 이용한 이동식 찜질시설의 실내 일산화탄소 농도 분석,,한국생활환경학회지
+25. 국내전문학술지(KCI급),201908,관가정의 창면적비와 주광률 검토를 통한 자연채광 성능 분석,,한국건축친환경설비학회 논문집
+26. 국내전문학술지(KCI급),201906,고열전도 콘크리트를 활용한 저온열원 융설시스템의  전열성능 실험연구,,한국건축친환경설비학회 논문집
+27. 국내전문학술지(KCI급),201904,재실 패턴과 재실자 신체적 특징을 고려한 건축물 용도 별 공기전파감염확률 분석,,한국건축친환경설비학회 논문집
+28. 국제전문학술지(SCI급),201812,Effect of the Physical Environment on the Health-related Quality of Life of the Low-income Korean Elderly Population,,IRANIAN JOURNAL OF PUBLIC HEALTH
+29. 국내전문학술지(KCI급),201810,베이비부머 전후세대의 공동주택 외부환경과 건강관련 삶의 질 지표에 대한 인식 분석,,한국생활환경학회지
+30. 국제전문학술지(SCI급),201809,Design Method to Prevent Airborne Infection in an Emergency Department,,JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING
+31. 국내전문학술지(KCI급),201806,송엽분과 질석을 포함한 준불연 단열복합보드의 개발,,한국화재소방학회 논문지
+32. 국내전문학술지(KCI급),201806,응급실 공기전파감염 위험도와 관련한 의료진의인식에 대한 조사연구,,한국건축친환경설비학회 논문집
+33. 국내전문학술지(KCI급),201804,공기전파감염확률 영향인자에 대한 매개변수 분석,,한국건축친환경설비학회 논문집
+34. 국제전문학술지(SCI급),201803,Case Study of Airborne Pathogen Dispersion Patterns in Emergency Departments with Different Ventilation and Partition Conditions,SCI,INTERNATIONAL JOURNAL OF ENVIRONMENTAL RESEARCH AND PUBLIC HEALTH
+35. 국내전문학술지(KCI급),201802,경골목구조 벽체의 내화성능확보를 위한 질석보드 개발,,한국화재소방학회 논문지
+36. 국내전문학술지(KCI급),201708,Relation between Overall Health Status and Environmental Satisfaction of Community Elders,,한국생활환경학회지
+37. 국제전문학술지(SCI급),201705,cooling energy reduction effect of parallel double-window system operation in residential buildings in south korea,SCIE,INDOOR AND BUILT ENVIRONMENT
+38. 국내전문학술지(KCI급),201704,PV시스템 적용 공동주택의 에너지 제로화를 위한적정 건축-규모 검토,,한국건축친환경설비학회 논문집
+39. 국내전문학술지(KCI급),201702,CFD를 이용한 병실 국부지역의 공기전파감염확률 평가사례,,한국건축친환경설비학회 논문집
+40. 국제전문학술지(SCI급),201701,A Modified Energy Evaluation Tool for Residential Complexes in South Korea to Reflect Total Electricity Consumption,SCIE,JOURNAL OF ASIAN ARCHITECTURE AND BUILDING ENGINEERING
+41. 국내전문학술지(KCI급),201612,실물실험을 통한 다이나믹 유량밸런싱 적용공동주택 세대의 에너지소비량 평가,,한국지열에너지학회논문집
+42. 국내전문학술지(KCI급),201612,외단열 동시타설 공법에서 단열재 부착강도에 관한 연구,,한국건축친환경설비학회 논문집
+43. 국내전문학술지(KCI급),201611,공동주택 지하주차장 유공벽의 표면결로방지 기법 검토,,대한건축학회논문집 계획계
+44. 국내전문학술지(KCI급),201606,친환경 캠퍼스의 외부공간에 대한 수요자의 선호도 조사,,주거환경
+45. 국내전문학술지(KCI급),201606,설계사례 조사를 통한 응급실 내 공기전파감염방지 개선방안,,한국생활환경학회지
+46. 국내전문학술지(KCI급),201604,캠퍼스 건축물 기밀성 향상을 통한 냉난방에너지소비량 저감효과 분석,,대한건축학회연합논문집
+47. 국내전문학술지(KCI급),201602,거주자의 주거환경 인식에 기반한 진주시 주거건물의에너지 리트로핏 우선순위 검토,,대한건축학회연합논문집
+48. 국내전문학술지(KCI급),201602,문헌고찰을 통한 노인요양시설 온열환경의 적정 수준 제안,,한국생활환경학회지
+49. 국내전문학술지(KCI급),201512,한국 건물부문 탄소세 도입 방안,,한국건축친환경설비학회 논문집
+50. 국내전문학술지(KCI급),201510,공동주택 지하주차장의 시환경 실태에 대한 조사연구,,대한건축학회연합논문집
+51. 국내전문학술지(KCI급),201504,단열배수판 시공방법에 따른 지하주차장 바닥슬래브 표면온도 상승효과 해석,,대한건축학회연합논문집
+52. 국내전문학술지(KCI급),201504,각형강관을 이용한 벽체용 영구단열거푸집의 표면변위 제어방법,,대한건축학회연합논문집
+53. 국제전문학술지(SCI급),201502,Lifecycle CO2 Reduction by Implementing Double Window Casement Systems in Residential Units in Korea,SCIE,Energies
+54. 국제전문학술지(SCI급),201410,Thermal and Daylighting Performance of Energy-Efficient Windows in Highly Glazed Residential Buildings: Case Study in Korea,SCIE,Sustainability
+
