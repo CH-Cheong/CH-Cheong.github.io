@@ -1,26 +1,26 @@
 Major Research Trends 
 
 2025–2026
-On-device LLM evaluation in the building-environment domain
-Construction of domain-specific QA benchmarks and dataset quality assessment
-AI-assisted research workflows and automation in architectural research
+-On-device LLM evaluation in the building-environment domain
+-Construction of domain-specific QA benchmarks and dataset quality assessment
+-AI-assisted research workflows and automation in architectural research
 
 2024–2025
-Urban-scale energy reduction strategies and building energy prediction models
-Framework development for healing environments
-Adaptive ventilation strategies in modular and single-occupancy units
+-Urban-scale energy reduction strategies and building energy prediction models
+-Framework development for healing environments
+-Adaptive ventilation strategies in modular and single-occupancy units
 
 2021–2023
-Ventilation optimization in classrooms and educational facilities
-Airborne infection probability modeling under occupancy scenarios
-Integration of hybrid mechanical ventilation and airflow control systems
+-Ventilation optimization in classrooms and educational facilities
+-Airborne infection probability modeling under occupancy scenarios
+-Integration of hybrid mechanical ventilation and airflow control systems
 
 2018–2020
-CFD-based airborne pathogen dispersion analysis in hospitals and emergency departments
-Application of Wells–Riley equation for infection risk prediction
-Environmental health and quality-of-life assessment studies
+-CFD-based airborne pathogen dispersion analysis in hospitals and emergency departments
+-Application of Wells–Riley equation for infection risk prediction
+-Environmental health and quality-of-life assessment studies
 
 2014–2017
-Energy-efficient residential system development (double windows, PV integration, airtightness improvement)
-Thermal comfort and daylighting performance evaluation
-Early exploration of infection control through environmental design
+-Energy-efficient residential system development (double windows, PV integration, airtightness improvement)
+-Thermal comfort and daylighting performance evaluation
+-Early exploration of infection control through environmental design
