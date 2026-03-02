@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CH Cheong — Online Apps</title>
+  <meta name="description" content="Online apps and tools." />
+  <style>
+    :root{--bg:#0b0f14;--text:#e8eef6;--muted:#9fb0c4;--line:#1b2a3a}
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      display:grid; place-items:center;
+      background:var(--bg); color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;
+    }
+    .wrap{width:min(880px, 92vw); padding:28px}
+    .frame{
+      border:1px solid var(--line); border-radius:16px;
+      padding:26px 22px; background:rgba(255,255,255,.02);
+    }
+    .top{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap}
+    .name{font-size:18px; font-weight:800; letter-spacing:.2px}
+    .meta{color:var(--muted); font-size:12px}
+    .line{height:1px; background:var(--line); margin:18px 0}
+    .desc{color:var(--muted); font-size:13px; line-height:1.7}
+    .list{margin-top:14px; display:grid; gap:10px}
+    .card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      background:rgba(255,255,255,.02);
+    }
+    .card-title{font-weight:800; margin-bottom:4px}
+    .card-text{color:var(--muted); font-size:12px; line-height:1.6}
+    .btnrow{margin-top:8px; display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      display:inline-flex; align-items:center;
+      padding:8px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-size:12px;
+      color:var(--text);
+      text-decoration:none;
+      background:rgba(255,255,255,.03);
+    }
+    .btn:hover{background:rgba(255,255,255,.06)}
+    .back{
+      display:inline-flex; align-items:center;
+      margin-top:16px; padding:8px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-size:12px;
+      color:var(--muted);
+      text-decoration:none;
+      background:rgba(255,255,255,.02);
+    }
+    .back:hover{background:rgba(255,255,255,.05)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="frame">
+      <div class="top">
+        <div class="name">Online Apps</div>
+        <div class="meta">Browser-based tools</div>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="desc">
+        웹에서 바로 실행 가능한 실험 도구/프로그램 모음입니다.
+      </div>
+
+      <div class="list">
+        <div class="card">
+          <div class="card-title">Simple 3D STL Maker (CFD Volume)</div>
+          <div class="card-text">
+            웹에서 간단히 3D STL 파일을 만들 수 있습니다. CFD용 건축물 실내 공기 체적 모델링 목적으로 개발되었습니다.
+          </div>
+          <div class="btnrow">
+            <a class="btn" href="./APP/stl-maker/">→ Run</a>
+          </div>
+        </div>
+
+        <!-- 형이 나중에 앱 추가할 때 아래 카드 복붙해서 늘리면 됨 -->
+        <!--
+        <div class="card">
+          <div class="card-title">App Name</div>
+          <div class="card-text">설명...</div>
+          <div class="btnrow">
+            <a class="btn" href="./APP/your-app/">→ Run</a>
+          </div>
+        </div>
+        -->
+      </div>
+
+      <a class="back" href="./">
+        ← Back to Cover
+      </a>
+    </div>
+  </div>
+</body>
+</html>
