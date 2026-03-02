@@ -28,7 +28,7 @@ SOFTWARE.
   <meta charset="UTF-8">
   <title>Simple 3D STL Maker (CFD Volume) — CH Cheong</title>
   <style>
-    body { font-family: sans-serif; display: flex; gap: 20px; }
+    body { font-family: sans-serif; display: flex; gap: 20px; padding-top: 48px; } /* ✅ 상단 고정 버튼 공간 확보 */
     #canvasWrapper { width: 800px; height: 800px; overflow: scroll; border: 1px solid #000; }
     canvas { background-color: #f0f0f0; transform-origin: top left; }
     #sidebar { width: 300px; }
@@ -50,24 +50,47 @@ SOFTWARE.
     .topnote-desc{ color:#333; line-height:1.35; margin-bottom: 4px; }
     .topnote-license{ color:#666; font-size: 12px; }
 
-</style>
+    /* ✅ 상단 고정 "뒤로가기" 버튼 */
+    .backbtn{
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 9999;
+
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+      color: #333;
+      text-decoration: none;
+      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .backbtn:hover{ background:#f0f0f0; }
+  </style>
 </head>
 <body>
 
+<!-- ✅ 화면 맨 위에 항상 보이도록 고정 -->
+<a class="backbtn" href="https://ch-cheong.github.io/apps.html">← Online Apps로 돌아가기</a>
+
 <div>
-  <h2> 3D 모델 작성 간단 프로그램 (STL 내보내기용)</h2>
+  <h2>3D 모델 작성 간단 프로그램 (STL 내보내기용)</h2>
+
   <div class="topnote">
-  <div class="topnote-title">사용법</div>
-  <div class="topnote-desc">
-    확대 버튼으로 그리드 확인(0.2 m × 0.2 m) -> 공간 그린 뒤 공간 확정, 바닥높이/높이이 수정 및 원점 지정합니다.<br/>
-    STL 출력을 누르면 3D 모델(STL)이 컴퓨터에 저장됩니다.
+    <div class="topnote-title">사용법</div>
+    <div class="topnote-desc">
+      확대 버튼으로 그리드 확인(0.2 m × 0.2 m) -> 공간 그린 뒤 공간 확정, 바닥높이/높이 수정 및 원점 지정합니다.<br/>
+      STL 출력을 누르면 3D 모델(STL)이 컴퓨터에 저장됩니다.
+    </div>
+    <div class="topnote-license">License: MIT (c) 2026 CH Cheong</div>
   </div>
-  <div class="topnote-license">License: MIT (c) 2026 CH Cheong</div>
-  </div>
-  
+
   <div id="canvasWrapper">
     <canvas id="floorplan" width="2000" height="2000"></canvas>
   </div>
+
   <div id="controls">
     <button id="confirmBtn" disabled>공간 확정</button>
     <button id="cancelBtn" disabled>취소</button>
@@ -75,7 +98,7 @@ SOFTWARE.
     <button id="zoomOut">축소</button>
     <button id="setOrigin">원점 지정</button>
     <button id="exportSTL">STL 출력</button>
-    <button id="deleteBtn" disabled>삭제</button> <!-- 추가 -->
+    <button id="deleteBtn" disabled>삭제</button>
   </div>
 </div>
 
@@ -159,25 +182,32 @@ function redraw() {
     ctx.fillStyle = 'rgba(135, 206, 235, 0.6)';
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
     drawCenterLine(rect);
-    ctx.save(); ctx.scale(1, -1); ctx.fillStyle = '#000'; ctx.fillText(`${(rect.w * scale / gridSize).toFixed(1)}m × ${(rect.h * scale / gridSize).toFixed(1)}m`, rect.x + 5, -rect.y - 15); ctx.restore();
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.fillStyle = '#000';
+    ctx.fillText(`${(rect.w * scale / gridSize).toFixed(1)}m × ${(rect.h * scale / gridSize).toFixed(1)}m`, rect.x + 5, -rect.y - 15);
+    ctx.restore();
   });
 
   if (previewRect) {
     drawCenterLine(previewRect);
-    ctx.save(); ctx.scale(1, -1); ctx.fillStyle = 'green'; ctx.fillText(`${(previewRect.w * scale / gridSize).toFixed(1)}m × ${(previewRect.h * scale / gridSize).toFixed(1)}m`, previewRect.x + 5, -previewRect.y - 15); ctx.restore();
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.fillStyle = 'green';
+    ctx.fillText(`${(previewRect.w * scale / gridSize).toFixed(1)}m × ${(previewRect.h * scale / gridSize).toFixed(1)}m`, previewRect.x + 5, -previewRect.y - 15);
+    ctx.restore();
   }
 
   drawOriginMark();
 
-if (selectedIndex !== null && rectangles[selectedIndex]) {
-  const r = rectangles[selectedIndex];
-  ctx.save();
-  ctx.strokeStyle = 'red';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(r.x, r.y, r.w, r.h);
-  ctx.restore();
-}
-
+  if (selectedIndex !== null && rectangles[selectedIndex]) {
+    const r = rectangles[selectedIndex];
+    ctx.save();
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+    ctx.restore();
+  }
 }
 
 canvas.addEventListener('mousedown', e => {
@@ -195,25 +225,26 @@ canvas.addEventListener('mousedown', e => {
     return;
   }
 
-// 공간 선택 모드
-if (!isDrawing && !settingOrigin) {
-  const clicked = rectangles.findIndex(r =>
-    x >= r.x && x <= r.x + r.w &&
-    y >= r.y && y <= r.y + r.h
-  );
-  if (clicked !== -1) {
-    selectedIndex = clicked;
-    deleteBtn.disabled = false;
-    updateZoneList();
-    redraw();
-    return;
-  } else {
-    selectedIndex = null;
-    deleteBtn.disabled = true;
-    updateZoneList();
-    redraw();
+  // 공간 선택 모드
+  if (!isDrawing && !settingOrigin) {
+    const clicked = rectangles.findIndex(r =>
+      x >= r.x && x <= r.x + r.w &&
+      y >= r.y && y <= r.y + r.h
+    );
+    if (clicked !== -1) {
+      selectedIndex = clicked;
+      deleteBtn.disabled = false;
+      updateZoneList();
+      redraw();
+      return;
+    } else {
+      selectedIndex = null;
+      deleteBtn.disabled = true;
+      updateZoneList();
+      redraw();
+    }
   }
-}
+
   if (isDrawing) return;
 
   startX = x;
@@ -310,12 +341,8 @@ function updateZoneList() {
   });
 }
 
-// STL 출력은 추후 연결 가능
 document.getElementById('exportSTL').onclick = () => {
   const perZoneTriangles = [];
-  const triangles = [];
-
-  // 🔵 중복 삼각형 방지용 Set 선언
   const triangleSet = new Set();
   const xyScale = (scale / gridSize) * 1000;
   const zScale = (scale / gridSize) * 1000 * 25;
@@ -324,18 +351,18 @@ document.getElementById('exportSTL').onclick = () => {
 
   rectangles.forEach((r, idx) => {
     const tris = [];
-
     if (!r || r.w === 0 || r.h === 0 || isNaN(r.w) || isNaN(r.h)) return;
+
     const x = toMM_XY(r.x), y = toMM_XY(r.y), w = toMM_XY(r.w), h = toMM_XY(r.h);
     const z = toMM_Z(r.floor ?? 0), height = toMM_Z(r.height ?? 2.4);
     if (isNaN(z) || isNaN(height)) return;
 
-   tris.push(...makeQuad(x, y, z, x + w, y, z, x + w, y + h, z, x, y + h, z, triangleSet));
-   tris.push(...makeQuad(x, y, z + height, x, y + h, z + height, x + w, y + h, z + height, x + w, y, z + height, triangleSet));
-   tris.push(...makeQuad(x, y, z, x, y, z + height, x + w, y, z + height, x + w, y, z, triangleSet));
-   tris.push(...makeQuad(x + w, y, z, x + w, y, z + height, x + w, y + h, z + height, x + w, y + h, z, triangleSet));
-   tris.push(...makeQuad(x + w, y + h, z, x + w, y + h, z + height, x, y + h, z + height, x, y + h, z, triangleSet));
-   tris.push(...makeQuad(x, y + h, z, x, y + h, z + height, x, y, z + height, x, y, z, triangleSet));
+    tris.push(...makeQuad(x, y, z, x + w, y, z, x + w, y + h, z, x, y + h, z, triangleSet));
+    tris.push(...makeQuad(x, y, z + height, x, y + h, z + height, x + w, y + h, z + height, x + w, y, z + height, triangleSet));
+    tris.push(...makeQuad(x, y, z, x, y, z + height, x + w, y, z + height, x + w, y, z, triangleSet));
+    tris.push(...makeQuad(x + w, y, z, x + w, y, z + height, x + w, y + h, z + height, x + w, y + h, z, triangleSet));
+    tris.push(...makeQuad(x + w, y + h, z, x + w, y + h, z + height, x, y + h, z + height, x, y + h, z, triangleSet));
+    tris.push(...makeQuad(x, y + h, z, x, y + h, z + height, x, y, z + height, x, y, z, triangleSet));
 
     perZoneTriangles.push(tris);
   });
@@ -349,7 +376,6 @@ document.getElementById('exportSTL').onclick = () => {
   downloadSTL(stl, 'floorplan_merged.stl');
 };
 
-// ✅ 중복 제거용 키 생성 함수
 function makeTriangleKey(tri) {
   const sorted = [
     [tri[0], tri[1], tri[2]],
@@ -367,7 +393,6 @@ function makeQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, triangleSet) {
   ];
 
   const unique = [];
-
   for (const tri of tris) {
     const key = makeTriangleKey(tri);
     if (!triangleSet.has(key)) {
@@ -375,7 +400,6 @@ function makeQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, triangleSet) {
       unique.push(tri);
     }
   }
-
   return unique;
 }
 
@@ -395,6 +419,7 @@ function generateSTL(perZoneTriangles) {
   stl += 'endsolid merged\n';
   return stl;
 }
+
 function downloadSTL(stlString, filename) {
   const blob = new Blob([stlString], { type: 'application/octet-stream' });
   const a = document.createElement('a');
@@ -402,6 +427,7 @@ function downloadSTL(stlString, filename) {
   a.download = filename;
   a.click();
 }
+
 const deleteBtn = document.getElementById('deleteBtn');
 deleteBtn.onclick = () => {
   if (selectedIndex !== null && rectangles[selectedIndex]) {
@@ -413,6 +439,7 @@ deleteBtn.onclick = () => {
   }
 };
 
+redraw();
 </script>
-
-
+</body>
+</html>
