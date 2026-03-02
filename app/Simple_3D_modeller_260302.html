@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<!--
+MIT License
+
+Copyright (c) 2026 CH Cheong
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple 3D STL Maker (CFD Volume) — CH Cheong</title>
+  <style>
+    body { font-family: sans-serif; display: flex; gap: 20px; }
+    #canvasWrapper { width: 800px; height: 800px; overflow: scroll; border: 1px solid #000; }
+    canvas { background-color: #f0f0f0; transform-origin: top left; }
+    #sidebar { width: 300px; }
+    .zone-item {
+      border: 1px solid #aaa; padding: 8px; margin-bottom: 10px; cursor: pointer;
+    }
+    .zone-item.active { background-color: #e0f7ff; border-color: #00aaff; }
+    input[type="number"] { width: 60px; }
+    button { margin: 4px 4px 0 0; }
+
+    .topnote{
+      margin: 10px 0 14px 0;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+    .topnote-title{ font-weight: 700; margin-bottom: 4px; }
+    .topnote-desc{ color:#333; line-height:1.35; margin-bottom: 4px; }
+    .topnote-license{ color:#666; font-size: 12px; }
+
+</style>
+</head>
+<body>
+
+<div>
+  <h2>도면 작성 (STL 내보내기용)</h2>
+  <div id="canvasWrapper">
+    <canvas id="floorplan" width="2000" height="2000"></canvas>
+  </div>
+  <div id="controls">
+    <button id="confirmBtn" disabled>공간 확정</button>
+    <button id="cancelBtn" disabled>취소</button>
+    <button id="zoomIn">확대</button>
+    <button id="zoomOut">축소</button>
+    <button id="setOrigin">원점 지정</button>
+    <button id="exportSTL">STL 출력</button>
+    <button id="deleteBtn" disabled>삭제</button> <!-- 추가 -->
+  </div>
+</div>
+
+<div id="sidebar">
+  <h3>공간 목록</h3>
+  <div id="zoneList"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+const canvas = document.getElementById('floorplan');
+const ctx = canvas.getContext('2d');
+const confirmBtn = document.getElementById('confirmBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const zoomIn = document.getElementById('zoomIn');
+const zoomOut = document.getElementById('zoomOut');
+const setOriginBtn = document.getElementById('setOrigin');
+const exportSTL = document.getElementById('exportSTL');
+const zoneList = document.getElementById('zoneList');
+
+let scale = 0.2; // 1칸 = 0.2m
+const gridSize = 5;
+let zoomLevel = 1;
+let origin = { x: 0, y: 0 };
+let settingOrigin = false;
+
+let rectangles = [];
+let isDrawing = false;
+let startX = null;
+let startY = null;
+let currentDraft = null;
+let previewRect = null;
+let selectedIndex = null;
+
+function snap(value) {
+  return Math.round(value / gridSize) * gridSize;
+}
+
+function drawGrid() {
+  ctx.strokeStyle = '#ddd';
+  for (let x = -origin.x % gridSize; x < canvas.width; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = -origin.y % gridSize; y < canvas.height; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
+function drawCenterLine(rect) {
+  ctx.setLineDash([4, 2]);
+  ctx.strokeStyle = 'green';
+  ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+  ctx.setLineDash([]);
+}
+
+function drawOriginMark() {
+  ctx.strokeStyle = 'red';
+  ctx.beginPath();
+  ctx.moveTo(origin.x - 10, origin.y);
+  ctx.lineTo(origin.x + 10, origin.y);
+  ctx.moveTo(origin.x, origin.y - 10);
+  ctx.lineTo(origin.x, origin.y + 10);
+  ctx.stroke();
+}
+
+function redraw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.scale(1, -1);
+  ctx.translate(0, -canvas.height);
+  ctx.scale(zoomLevel, zoomLevel);
+
+  drawGrid();
+  rectangles.forEach((rect, i) => {
+    ctx.fillStyle = 'rgba(135, 206, 235, 0.6)';
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    drawCenterLine(rect);
+    ctx.save(); ctx.scale(1, -1); ctx.fillStyle = '#000'; ctx.fillText(`${(rect.w * scale / gridSize).toFixed(1)}m × ${(rect.h * scale / gridSize).toFixed(1)}m`, rect.x + 5, -rect.y - 15); ctx.restore();
+  });
+
+  if (previewRect) {
+    drawCenterLine(previewRect);
+    ctx.save(); ctx.scale(1, -1); ctx.fillStyle = 'green'; ctx.fillText(`${(previewRect.w * scale / gridSize).toFixed(1)}m × ${(previewRect.h * scale / gridSize).toFixed(1)}m`, previewRect.x + 5, -previewRect.y - 15); ctx.restore();
+  }
+
+  drawOriginMark();
+
+if (selectedIndex !== null && rectangles[selectedIndex]) {
+  const r = rectangles[selectedIndex];
+  ctx.save();
+  ctx.strokeStyle = 'red';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(r.x, r.y, r.w, r.h);
+  ctx.restore();
+}
+
+}
+
+canvas.addEventListener('mousedown', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const x = snap(mx / zoomLevel);
+  const y = snap((canvas.height - my) / zoomLevel);
+
+  if (settingOrigin) {
+    origin = { x, y };
+    settingOrigin = false;
+    setOriginBtn.textContent = '원점 지정';
+    redraw();
+    return;
+  }
+
+// 공간 선택 모드
+if (!isDrawing && !settingOrigin) {
+  const clicked = rectangles.findIndex(r =>
+    x >= r.x && x <= r.x + r.w &&
+    y >= r.y && y <= r.y + r.h
+  );
+  if (clicked !== -1) {
+    selectedIndex = clicked;
+    deleteBtn.disabled = false;
+    updateZoneList();
+    redraw();
+    return;
+  } else {
+    selectedIndex = null;
+    deleteBtn.disabled = true;
+    updateZoneList();
+    redraw();
+  }
+}
+  if (isDrawing) return;
+
+  startX = x;
+  startY = y;
+  isDrawing = true;
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!isDrawing) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const currX = snap(mx / zoomLevel);
+  const currY = snap((canvas.height - my) / zoomLevel);
+
+  previewRect = {
+    x: Math.min(startX, currX),
+    y: Math.min(startY, currY),
+    w: Math.abs(currX - startX),
+    h: Math.abs(currY - startY)
+  };
+
+  redraw();
+});
+
+canvas.addEventListener('mouseup', () => {
+  if (!isDrawing || !previewRect) return;
+  currentDraft = previewRect;
+  previewRect = null;
+  isDrawing = false;
+  confirmBtn.disabled = false;
+  cancelBtn.disabled = false;
+  redraw();
+});
+
+confirmBtn.onclick = () => {
+  if (currentDraft) {
+    rectangles.push({
+      ...currentDraft,
+      height: 2.4,
+      floor: 0.0
+    });
+    currentDraft = null;
+    confirmBtn.disabled = true;
+    cancelBtn.disabled = true;
+    updateZoneList();
+    redraw();
+  }
+};
+
+cancelBtn.onclick = () => {
+  currentDraft = null;
+  previewRect = null;
+  isDrawing = false;
+  confirmBtn.disabled = true;
+  cancelBtn.disabled = true;
+  redraw();
+};
+
+zoomIn.onclick = () => {
+  zoomLevel *= 1.1;
+  redraw();
+};
+
+zoomOut.onclick = () => {
+  zoomLevel /= 1.1;
+  redraw();
+};
+
+setOriginBtn.onclick = () => {
+  settingOrigin = true;
+  setOriginBtn.textContent = '원점 찍기 중…';
+};
+
+function updateZoneList() {
+  zoneList.innerHTML = '';
+  rectangles.forEach((r, i) => {
+    const mw = (r.w * scale / gridSize).toFixed(1);
+    const mh = (r.h * scale / gridSize).toFixed(1);
+    const div = document.createElement('div');
+    div.className = 'zone-item' + (i === selectedIndex ? ' active' : '');
+    div.innerHTML = `
+      공간 ${i + 1} <br>${mw}m × ${mh}m<br>
+      바닥높이: <input type="number" value="${r.floor}" step="0.1" data-floor="${i}" /> m<br>
+      높이: <input type="number" value="${r.height}" step="0.1" data-height="${i}" /> m<br>
+    `;
+    div.querySelector('input[data-floor]').onchange = e => {
+      rectangles[i].floor = parseFloat(e.target.value);
+    };
+    div.querySelector('input[data-height]').onchange = e => {
+      rectangles[i].height = parseFloat(e.target.value);
+    };
+    zoneList.appendChild(div);
+  });
+}
+
+// STL 출력은 추후 연결 가능
+document.getElementById('exportSTL').onclick = () => {
+  const perZoneTriangles = [];
+  const triangles = [];
+
+  // 🔵 중복 삼각형 방지용 Set 선언
+  const triangleSet = new Set();
+  const xyScale = (scale / gridSize) * 1000;
+  const zScale = (scale / gridSize) * 1000 * 25;
+  const toMM_XY = v => v * xyScale;
+  const toMM_Z  = v => v * zScale;
+
+  rectangles.forEach((r, idx) => {
+    const tris = [];
+
+    if (!r || r.w === 0 || r.h === 0 || isNaN(r.w) || isNaN(r.h)) return;
+    const x = toMM_XY(r.x), y = toMM_XY(r.y), w = toMM_XY(r.w), h = toMM_XY(r.h);
+    const z = toMM_Z(r.floor ?? 0), height = toMM_Z(r.height ?? 2.4);
+    if (isNaN(z) || isNaN(height)) return;
+
+   tris.push(...makeQuad(x, y, z, x + w, y, z, x + w, y + h, z, x, y + h, z, triangleSet));
+   tris.push(...makeQuad(x, y, z + height, x, y + h, z + height, x + w, y + h, z + height, x + w, y, z + height, triangleSet));
+   tris.push(...makeQuad(x, y, z, x, y, z + height, x + w, y, z + height, x + w, y, z, triangleSet));
+   tris.push(...makeQuad(x + w, y, z, x + w, y, z + height, x + w, y + h, z + height, x + w, y + h, z, triangleSet));
+   tris.push(...makeQuad(x + w, y + h, z, x + w, y + h, z + height, x, y + h, z + height, x, y + h, z, triangleSet));
+   tris.push(...makeQuad(x, y + h, z, x, y + h, z + height, x, y, z + height, x, y, z, triangleSet));
+
+    perZoneTriangles.push(tris);
+  });
+
+  if (perZoneTriangles.length === 0) {
+    alert("출력할 도형이 없습니다.");
+    return;
+  }
+
+  const stl = generateSTL(perZoneTriangles);
+  downloadSTL(stl, 'floorplan_merged.stl');
+};
+
+// ✅ 중복 제거용 키 생성 함수
+function makeTriangleKey(tri) {
+  const sorted = [
+    [tri[0], tri[1], tri[2]],
+    [tri[3], tri[4], tri[5]],
+    [tri[6], tri[7], tri[8]],
+  ].sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
+
+  return sorted.flat().map(n => n.toFixed(4)).join(',');
+}
+
+function makeQuad(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, triangleSet) {
+  const tris = [
+    [x1, y1, z1, x3, y3, z3, x2, y2, z2],
+    [x1, y1, z1, x4, y4, z4, x3, y3, z3]
+  ];
+
+  const unique = [];
+
+  for (const tri of tris) {
+    const key = makeTriangleKey(tri);
+    if (!triangleSet.has(key)) {
+      triangleSet.add(key);
+      unique.push(tri);
+    }
+  }
+
+  return unique;
+}
+
+function generateSTL(perZoneTriangles) {
+  let stl = 'solid merged\n';
+  perZoneTriangles.forEach(triangles => {
+    triangles.forEach(tri => {
+      stl += '  facet normal 0 0 0\n';
+      stl += '    outer loop\n';
+      for (let i = 0; i < 3; i++) {
+        stl += `      vertex ${tri[i * 3]} ${tri[i * 3 + 1]} ${tri[i * 3 + 2]}\n`;
+      }
+      stl += '    endloop\n';
+      stl += '  endfacet\n';
+    });
+  });
+  stl += 'endsolid merged\n';
+  return stl;
+}
+function downloadSTL(stlString, filename) {
+  const blob = new Blob([stlString], { type: 'application/octet-stream' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+const deleteBtn = document.getElementById('deleteBtn');
+deleteBtn.onclick = () => {
+  if (selectedIndex !== null && rectangles[selectedIndex]) {
+    rectangles.splice(selectedIndex, 1);
+    selectedIndex = null;
+    deleteBtn.disabled = true;
+    updateZoneList();
+    redraw();
+  }
+};
+
+</script>
+
+
