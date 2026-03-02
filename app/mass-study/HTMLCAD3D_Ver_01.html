@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<title>평면 배치 + 층/3D (층별 독립 + 층 복사)</title>
+<style>
+  body{margin:0;display:flex;height:100vh;font-family:system-ui,Segoe UI,Malgun Gothic,sans-serif;background:#ddd;}
+  #left,#right{width:300px;background:#f5f5f5;padding:12px;overflow:auto}
+  #center{flex:1;display:flex;flex-direction:column;gap:8px;padding:8px;}
+  #canvasWrap{flex:1;min-height:360px;background:#fff;border:1px solid #aaa;display:flex;align-items:center;justify-content:center;}
+  svg{background:#fff;width:100%;height:100%}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  th,td{border:1px solid #ccc;padding:4px;text-align:center}
+  .delBtn{background:#f66;color:#fff;border:none;border-radius:4px;cursor:pointer;padding:2px 6px}
+  .paletteItem{display:flex;align-items:center;cursor:pointer;margin:6px 0}
+  .paletteColor{width:18px;height:18px;margin-right:6px;border:1px solid #555}
+  .row{margin:6px 0;display:flex;align-items:center;gap:6px}
+  input[type="number"]{width:110px;padding:4px}
+  .btn{padding:6px 10px;border:1px solid #888;background:#fff;cursor:pointer;border-radius:6px}
+  #threeWrap{height:320px;border:1px solid #aaa;background:#fff;position:relative}
+  #threeCanvas{width:100%;height:100%}
+  .hint{color:#666;font-size:12px;margin:4px 0}
+</style>
+</head>
+<body>
+  <!-- LEFT -->
+  <div id="left">
+    <h3>대지 조건 (m)</h3>
+    <div class="row">가로: <input id="siteW" type="number" step="0.1" value="12.0"></div>
+    <div class="row">세로: <input id="siteH" type="number" step="0.1" value="8.0"></div>
+    <div class="row">대지 경계 이격: <input id="setback" type="number" step="0.1" value="1.0"></div>
+    <div class="row"><button class="btn" onclick="setSite()">적용</button></div>
+    <div class="hint" id="siteAreaHint">대지면적: — ㎡ (— 평)</div>
+    <div class="hint" id="insetHint">내부 경계: — × — m</div>
+
+    <h3>층 설정</h3>
+    <div class="row">층 높이: <input id="floorH" type="number" step="0.1" value="2.8"> m</div>
+    <div class="row" style="gap:8px; flex-wrap:wrap">
+      <label for="floorSel">현재 층:</label>
+      <select id="floorSel" onchange="switchFloor(this.value)"></select>
+      <button class="btn" onclick="addFloor()">+ 층</button>
+      <button class="btn" onclick="removeFloor()">– 삭제</button>
+      <button class="btn" onclick="onCopyFloor()">층 복사</button>
+    </div>
+
+    <h3>블록 팔레트</h3>
+    <div id="palette"></div>
+    <div class="hint">* 클릭 → 중앙에 추가 (초기 2.0×2.0 m) · 이동/크기 모두 <b>0.1 m</b> 스냅</div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center">
+    <div id="canvasWrap">
+      <svg id="svg" aria-label="평면 SVG"></svg>
+    </div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" onclick="update3D()">3D 업데이트</button></div>
+    <div id="threeWrap"><canvas id="threeCanvas"></canvas></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div id="right">
+    <h3>공간 목록 (현재 층 · m)</h3>
+    <table>
+      <thead><tr><th>이름</th><th>가로</th><th>세로</th><th>삭제</th></tr></thead>
+      <tbody id="blockTable"></tbody>
+    </table>
+    <div id="totals" class="hint">총 면적(현재 층): — ㎡ (— 평)</div>
+  </div>
+
+  <!-- 오프라인 three.js -->
+  <script src="./three.min.js"></script>
+  <script src="./OrbitControls.js"></script>
+
+<script>
+/* ===== 상태/상수 ===== */
+const GRID = 0.1;
+const PYEONG = 3.305785;
+let site = { w:12.0, h:8.0, setback:1.0 };
+let floors = [{name:"1층", blocks:[]}];
+let currentFloor = 0;
+let dragging = null, offsetX=0, offsetY=0;
+
+const typeColors = {
+  "거실":"#add8e6","방":"#90ee90","주방":"#ffcc99","화장실":"#d3d3d3",
+  "발코니":"#a0e0e0","다용도실":"#dda0dd","대피공간":"#fff799","현관":"#deb887",
+  "복도":"#e6e6fa","계단실":"#ffb86b"
+};
+const overlayColors = ["#cfcfcf","#a0c4ff","#bdb2ff","#ffc6ff"];
+
+/* ===== 유틸 ===== */
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function snap01(v){ return Math.round(v / GRID) * GRID; }
+function parseDec(str, def){
+  if (str==null) return def;
+  const v = +String(str).replace(",",".");
+  return isNaN(v)? def : v;
+}
+function newId(){ return "B"+Date.now()+Math.random().toString(36).slice(2,6); }
+
+/* ===== 층 ===== */
+function refreshFloorSel(){
+  const sel=document.getElementById('floorSel');
+  sel.innerHTML = floors.map((f,i)=>`<option value="${i}" ${i===currentFloor?"selected":""}>${f.name}</option>`).join('');
+}
+function addFloor(){
+  const idx = floors.length;
+  floors.push({name:`${idx+1}층`, blocks:[]}); // 층별 독립
+  currentFloor = idx;
+  refreshFloorSel(); draw();
+}
+function removeFloor(){ if(floors.length<=1)return; floors.splice(currentFloor,1); currentFloor=Math.max(0,currentFloor-1); refreshFloorSel(); draw(); }
+function switchFloor(i){ currentFloor=+i; draw(); }
+
+/* 층 복사: from → to (덮어쓰기, 새 id 발급) */
+function copyFloor(fromIdx, toIdx){
+  if(fromIdx===toIdx) return;
+  const src = floors[fromIdx];
+  const dst = floors[toIdx];
+  const newBlocks = src.blocks.map(b=>({
+    id: newId(),
+    type: b.type,
+    x: b.x, y: b.y, w: b.w, h: b.h
+  }));
+  dst.blocks = newBlocks;
+  currentFloor = toIdx;
+  refreshFloorSel();
+  draw();
+}
+function onCopyFloor(){
+  if(floors.length<=1){
+    alert("복사할 대상 층이 없습니다. 먼저 층을 추가하세요.");
+    return;
+  }
+ const to = currentFloor; // 현재 층에 덮어쓰기
+ const input = prompt(`어느 층에서 가져올까요? (1~${floors.length}, 현재:${to+1}층)`);
+ if(input==null) return;
+ const from = parseInt(input,10)-1;
+ if(isNaN(from) || from<0 || from>=floors.length || from===to){
+   alert("복사할 층 번호가 올바르지 않습니다."); return;
+ }
+ copyFloor(from, to);
+}
+
+/* ===== 팔레트 ===== */
+function buildPalette(){
+  const pal=document.getElementById('palette'); pal.innerHTML="";
+  Object.keys(typeColors).forEach(type=>{
+    const d=document.createElement('div'); d.className="paletteItem"; d.onclick=()=>addBlock(type);
+    const c=document.createElement('div'); c.className="paletteColor"; c.style.background=typeColors[type];
+    d.appendChild(c); d.appendChild(document.createTextNode(type)); pal.appendChild(d);
+  });
+}
+
+/* ===== 대지 ===== */
+function getInset(){ const s=site.setback; return {x:s, y:s, w:Math.max(0,site.w-2*s), h:Math.max(0,site.h-2*s)}; }
+function setSite(){
+  site.w = snap01(parseDec(document.getElementById('siteW').value, site.w));
+  site.h = snap01(parseDec(document.getElementById('siteH').value, site.h));
+  site.setback = snap01(clamp(parseDec(document.getElementById('setback').value, site.setback), 0, Math.min(site.w,site.h)/2 - GRID));
+  document.getElementById('siteW').value = site.w.toFixed(1);
+  document.getElementById('siteH').value = site.h.toFixed(1);
+  document.getElementById('setback').value = site.setback.toFixed(1);
+
+  const area = site.w*site.h;
+  document.getElementById('siteAreaHint').textContent = `대지면적: ${area.toFixed(1)} ㎡ (${(area/PYEONG).toFixed(2)} 평)`;
+  const ins=getInset();
+  document.getElementById('insetHint').textContent = `내부 경계: ${ins.w.toFixed(1)} × ${ins.h.toFixed(1)} m`;
+
+  // 모든 블록을 inset 안으로 클램프
+  floors.forEach(fl=>fl.blocks.forEach(b=>{
+    if (b.w > ins.w) { b.w = ins.w; }
+    if (b.h > ins.h) { b.h = ins.h; }
+    b.x = clamp(b.x, ins.x, ins.x + ins.w - b.w);
+    b.y = clamp(b.y, ins.y, ins.y + ins.h - b.h);
+  }));
+
+  draw();
+}
+
+/* ===== 블록 추가/삭제 ===== */
+function addBlock(type){
+  const ins=getInset();
+  const base = { id:newId(), type, x:ins.x, y:ins.y, w:2.0, h:2.0 };
+  base.w = snap01(Math.min(base.w, Math.max(GRID, ins.w)));
+  base.h = snap01(Math.min(base.h, Math.max(GRID, ins.h)));
+
+  floors[currentFloor].blocks.push(base); // 층별 독립
+  draw();
+}
+function deleteBlock(id){
+  const fl = floors[currentFloor];
+  fl.blocks = fl.blocks.filter(b=>b.id!==id);
+  draw();
+}
+
+/* ===== 우측 목록 + 입력 반영 ===== */
+function updateTable(){
+  const tb=document.getElementById('blockTable'); tb.innerHTML="";
+  floors[currentFloor].blocks.forEach(b=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `
+      <td>${b.type}</td>
+      <td><input type="number" step="0.1" inputmode="decimal" value="${b.w.toFixed(1)}" data-id="${b.id}" data-prop="w"></td>
+      <td><input type="number" step="0.1" inputmode="decimal" value="${b.h.toFixed(1)}" data-id="${b.id}" data-prop="h"></td>
+      <td><button class="delBtn" onclick="deleteBlock('${b.id}')">X</button></td>`;
+    tb.appendChild(tr);
+  });
+
+  function apply(inp){
+    const blk=floors[currentFloor].blocks.find(x=>x.id===inp.dataset.id);
+    const prop=inp.dataset.prop;
+    const ins=getInset();
+
+    let v = snap01(parseDec(inp.value, blk[prop]));
+    v = Math.max(GRID, v);
+    blk[prop]=v;
+
+    // 넘치면 반대방향으로 이동
+    const overflowRight  = (blk.x + blk.w) - (ins.x + ins.w);
+    const overflowBottom = (blk.y + blk.h) - (ins.y + ins.h);
+    if (overflowRight > 0)  blk.x -= overflowRight;
+    if (overflowBottom > 0) blk.y -= overflowBottom;
+
+    // inset 밖이면 클램프
+    blk.x = clamp(blk.x, ins.x, ins.x + ins.w - blk.w);
+    blk.y = clamp(blk.y, ins.y, ins.y + ins.h - blk.h);
+
+    inp.value = blk[prop].toFixed(1);
+    draw();
+  }
+
+  tb.querySelectorAll("input").forEach(inp=>{
+    inp.addEventListener('change', ()=>apply(inp));
+    inp.addEventListener('blur',   ()=>apply(inp));
+    inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); apply(inp); inp.blur(); }});
+    inp.addEventListener('wheel', e=> e.preventDefault(), {passive:false});
+  });
+
+  // 총합
+  const total = floors[currentFloor].blocks.reduce((a,b)=>a + b.w*b.h, 0);
+  document.getElementById('totals').textContent = `총 면적(현재 층): ${total.toFixed(2)} ㎡ (${(total/PYEONG).toFixed(2)} 평)`;
+}
+
+/* ===== 2D 그리기 + 드래그 ===== */
+function draw(){
+  const svg=document.getElementById('svg'); svg.innerHTML="";
+  const W=svg.clientWidth, H=svg.clientHeight;
+  const s=Math.min(W/site.w, H/site.h);
+  const ox=(W-site.w*s)/2, oy=(H-site.h*s)/2;
+  const ins=getInset();
+
+  // 그리드
+  for(let x=0; x<=site.w+1e-9; x+=GRID){
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",ox+x*s); l.setAttribute("y1",oy);
+    l.setAttribute("x2",ox+x*s); l.setAttribute("y2",oy+site.h*s);
+    l.setAttribute("stroke","#eee"); svg.appendChild(l);
+  }
+  for(let y=0; y<=site.h+1e-9; y+=GRID){
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",ox); l.setAttribute("y1",oy+y*s);
+    l.setAttribute("x2",ox+site.w*s); l.setAttribute("y2",oy+y*s);
+    l.setAttribute("stroke","#eee"); svg.appendChild(l);
+  }
+  const glbl=document.createElementNS("http://www.w3.org/2000/svg","text");
+  glbl.setAttribute("x", ox+8); glbl.setAttribute("y", oy+16);
+  glbl.setAttribute("fill", "#888"); glbl.setAttribute("font-size", "12");
+  glbl.textContent = "Grid: 0.1 m"; svg.appendChild(glbl);
+
+  // 대지 경계 / 이격
+  let r=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  r.setAttribute("x",ox); r.setAttribute("y",oy);
+  r.setAttribute("width",site.w*s); r.setAttribute("height",site.h*s);
+  r.setAttribute("fill","none"); r.setAttribute("stroke","black"); r.setAttribute("stroke-width","2");
+  svg.appendChild(r);
+
+  r=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  r.setAttribute("x",ox+ins.x*s); r.setAttribute("y",oy+ins.y*s);
+  r.setAttribute("width",ins.w*s); r.setAttribute("height",ins.h*s);
+  r.setAttribute("fill","none"); r.setAttribute("stroke","red");
+  r.setAttribute("stroke-width","2"); r.setAttribute("stroke-dasharray","6,6");
+  svg.appendChild(r);
+
+  // 하층 오버레이(각 블록 테두리)
+  if(currentFloor>0){
+    for(let fi=0; fi<currentFloor; fi++){
+      const color=overlayColors[fi%overlayColors.length];
+      floors[fi].blocks.forEach(b=>{
+        const rr=document.createElementNS("http://www.w3.org/2000/svg","rect");
+        rr.setAttribute("x", ox+b.x*s); rr.setAttribute("y", oy+b.y*s);
+        rr.setAttribute("width", b.w*s); rr.setAttribute("height", b.h*s);
+        rr.setAttribute("fill", "none");
+        rr.setAttribute("stroke", color);
+        rr.setAttribute("stroke-width", "1.5");
+        rr.setAttribute("stroke-dasharray", b.type==="계단실" ? "2,2" : "4,2");
+        rr.setAttribute("opacity", "0.8");
+        svg.appendChild(rr);
+      });
+    }
+  }
+
+  // 현재 층 블록 + 라벨
+  floors[currentFloor].blocks.forEach(b=>{
+    const rx=ox+b.x*s, ry=oy+b.y*s, rw=b.w*s, rh=b.h*s;
+    const rect=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rect.setAttribute("x",rx); rect.setAttribute("y",ry);
+    rect.setAttribute("width",rw); rect.setAttribute("height",rh);
+    rect.setAttribute("fill",typeColors[b.type]||"#ccc"); rect.setAttribute("stroke","#333");
+    rect.dataset.id=b.id; svg.appendChild(rect);
+
+    const name=document.createElementNS("http://www.w3.org/2000/svg","text");
+    name.setAttribute("x",rx+4); name.setAttribute("y",ry+14);
+    name.setAttribute("font-size","12"); name.setAttribute("fill","#233");
+    name.textContent=b.type; svg.appendChild(name);
+
+    const size=document.createElementNS("http://www.w3.org/2000/svg","text");
+    size.setAttribute("x",rx+4); size.setAttribute("y",ry+28);
+    size.setAttribute("font-size","12"); size.setAttribute("fill","#233");
+    size.textContent=`(${b.w.toFixed(1)}×${b.h.toFixed(1)} m)`; svg.appendChild(size);
+  });
+
+  // 드래그 시작
+  svg.querySelectorAll("rect").forEach(el=>{
+    if(!el.dataset.id) return;
+    el.onmousedown=(e)=>{
+      const arr=floors[currentFloor].blocks;
+      dragging = arr.find(x=>x.id===el.dataset.id);
+      const W=svg.clientWidth,H=svg.clientHeight;
+      const s=Math.min(W/site.w,H/site.h);
+      const ox=(W-site.w*s)/2, oy=(H-site.h*s)/2;
+      offsetX = e.offsetX - (ox + dragging.x*s);
+      offsetY = e.offsetY - (oy + dragging.y*s);
+    };
+  });
+
+  // 드래그 이동 (스냅 + 이격경계)
+  svg.onmousemove=(e)=>{
+    if(!dragging) return;
+    const W=svg.clientWidth,H=svg.clientHeight;
+    const s=Math.min(W/site.w,H/site.h);
+    const ox=(W-site.w*s)/2, oy=(H-site.h*s)/2;
+    const ins=getInset();
+    let nx = (e.offsetX - offsetX - ox)/s;
+    let ny = (e.offsetY - offsetY - oy)/s;
+    nx = snap01(nx); ny = snap01(ny);
+    nx = clamp(nx, ins.x, ins.x + ins.w - dragging.w);
+    ny = clamp(ny, ins.y, ins.y + ins.h - dragging.h);
+    dragging.x = nx; dragging.y = ny;
+    draw();
+  };
+  svg.onmouseup=()=>{ dragging=null; };
+  svg.onmouseleave=()=>{ dragging=null; };
+
+  updateTable();
+}
+
+/* ===== 3D ===== */
+let three = {};
+function init3D(){
+  const canvas=document.getElementById('threeCanvas');
+  const r=new THREE.WebGLRenderer({canvas,antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  r.setSize(canvas.clientWidth, canvas.clientHeight, false);
+  const scene=new THREE.Scene(); scene.background=new THREE.Color(0xffffff);
+  const cam=new THREE.PerspectiveCamera(45, canvas.clientWidth/canvas.clientHeight, 0.1, 1000);
+  cam.position.set(-10,12,16);
+  const ctl=new THREE.OrbitControls(cam,canvas);
+  ctl.target.set(0,0,0); ctl.update();
+  three={renderer:r, scene, camera:cam, controls:ctl};
+  animate3D();
+}
+function animate3D(){
+  requestAnimationFrame(animate3D);
+  if(three.renderer){
+    // 리사이즈 대응
+    const c = three.renderer.domElement;
+    if (c.width !== c.clientWidth || c.height !== c.clientHeight){
+      three.renderer.setSize(c.clientWidth, c.clientHeight, false);
+      three.camera.aspect = c.clientWidth / c.clientHeight;
+      three.camera.updateProjectionMatrix();
+    }
+    three.renderer.render(three.scene, three.camera);
+  }
+}
+function update3D(){
+  if(!three.scene) init3D();
+  const scene=three.scene;
+  // reset
+  while(scene.children.length) scene.remove(scene.children[0]);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x888888,1));
+  const dir=new THREE.DirectionalLight(0xffffff,0.8); dir.position.set(10,20,10); scene.add(dir);
+
+  const floorH = parseDec(document.getElementById('floorH').value, 2.8) || 2.8;
+  const cx = site.w/2, cz = site.h/2;
+  const inset = getInset();
+
+  // 바닥판 (이격 내부)
+  {
+    const slabGeo = new THREE.BoxGeometry(inset.w, 0.05, inset.h);
+    const slabMat = new THREE.MeshLambertMaterial({color:0xf0f0f0});
+    const slab = new THREE.Mesh(slabGeo, slabMat);
+    slab.position.set(inset.x + inset.w/2 - cx, -0.03, inset.y + inset.h/2 - cz);
+    scene.add(slab);
+
+    const edges = new THREE.EdgesGeometry(slabGeo);
+    const line  = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0x999999}));
+    line.position.copy(slab.position);
+    scene.add(line);
+  }
+
+  // 블록
+  floors.forEach((fl, fi)=>{
+    const y0 = fi*floorH;
+    fl.blocks.forEach(b=>{
+      const geo = new THREE.BoxGeometry(b.w, floorH, b.h);
+      const mat = new THREE.MeshLambertMaterial({
+        color: new THREE.Color(typeColors[b.type]||'#cccccc'),
+        transparent: (b.type==="계단실"),
+        opacity: (b.type==="계단실"?0.7:1.0)
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(b.x + b.w/2 - cx, y0 + floorH/2, b.y + b.h/2 - cz);
+      scene.add(mesh);
+
+      const edges=new THREE.EdgesGeometry(geo);
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0x333333}));
+      line.position.copy(mesh.position);
+      scene.add(line);
+    });
+  });
+
+  three.controls.target.set(0, floorH*0.5, 0);
+  three.controls.update();
+}
+
+/* ===== 초기화 ===== */
+buildPalette();
+refreshFloorSel();
+setSite();
+</script>
+</body>
+</html>
