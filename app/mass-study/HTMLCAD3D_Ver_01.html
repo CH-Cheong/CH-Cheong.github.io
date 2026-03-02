@@ -2,9 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<title>평면 배치 + 층/3D (층별 독립 + 층 복사)</title>
+<title>3D 매스 스터디 시뮬레이터 (공간블록 배치 + 층별 작성 + 층 복사)</title>
 <style>
-  body{margin:0;display:flex;height:100vh;font-family:system-ui,Segoe UI,Malgun Gothic,sans-serif;background:#ddd;}
+  /* ✅ 상단 고정 버튼 공간 확보 */
+  body{margin:0;display:flex;height:100vh;font-family:system-ui,Segoe UI,Malgun Gothic,sans-serif;background:#ddd; padding-top:48px;}
+
   #left,#right{width:300px;background:#f5f5f5;padding:12px;overflow:auto}
   #center{flex:1;display:flex;flex-direction:column;gap:8px;padding:8px;}
   #canvasWrap{flex:1;min-height:360px;background:#fff;border:1px solid #aaa;display:flex;align-items:center;justify-content:center;}
@@ -20,9 +22,31 @@
   #threeWrap{height:320px;border:1px solid #aaa;background:#fff;position:relative}
   #threeCanvas{width:100%;height:100%}
   .hint{color:#666;font-size:12px;margin:4px 0}
+
+  /* ✅ apps.html로 돌아가기 버튼 (상단 고정) */
+  .backbtn{
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 9999;
+
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .backbtn:hover{ background:#f2f2f2; }
 </style>
 </head>
 <body>
+  <!-- ✅ 화면 맨 위에 항상 보이도록 고정 -->
+  <a class="backbtn" href="https://ch-cheong.github.io/apps.html">← Online Apps로 돌아가기</a>
+
   <!-- LEFT -->
   <div id="left">
     <h3>대지 조건 (m)</h3>
@@ -92,7 +116,7 @@ function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 function snap01(v){ return Math.round(v / GRID) * GRID; }
 function parseDec(str, def){
   if (str==null) return def;
-  const v = +String(str).replace(",",".");
+  const v = +String(str).replace(",","." );
   return isNaN(v)? def : v;
 }
 function newId(){ return "B"+Date.now()+Math.random().toString(36).slice(2,6); }
@@ -131,14 +155,14 @@ function onCopyFloor(){
     alert("복사할 대상 층이 없습니다. 먼저 층을 추가하세요.");
     return;
   }
- const to = currentFloor; // 현재 층에 덮어쓰기
- const input = prompt(`어느 층에서 가져올까요? (1~${floors.length}, 현재:${to+1}층)`);
- if(input==null) return;
- const from = parseInt(input,10)-1;
- if(isNaN(from) || from<0 || from>=floors.length || from===to){
-   alert("복사할 층 번호가 올바르지 않습니다."); return;
- }
- copyFloor(from, to);
+  const to = currentFloor; // 현재 층에 덮어쓰기
+  const input = prompt(`어느 층에서 가져올까요? (1~${floors.length}, 현재:${to+1}층)`);
+  if(input==null) return;
+  const from = parseInt(input,10)-1;
+  if(isNaN(from) || from<0 || from>=floors.length || from===to){
+    alert("복사할 층 번호가 올바르지 않습니다."); return;
+  }
+  copyFloor(from, to);
 }
 
 /* ===== 팔레트 ===== */
@@ -372,7 +396,6 @@ function init3D(){
 function animate3D(){
   requestAnimationFrame(animate3D);
   if(three.renderer){
-    // 리사이즈 대응
     const c = three.renderer.domElement;
     if (c.width !== c.clientWidth || c.height !== c.clientHeight){
       three.renderer.setSize(c.clientWidth, c.clientHeight, false);
@@ -385,7 +408,6 @@ function animate3D(){
 function update3D(){
   if(!three.scene) init3D();
   const scene=three.scene;
-  // reset
   while(scene.children.length) scene.remove(scene.children[0]);
   scene.add(new THREE.HemisphereLight(0xffffff,0x888888,1));
   const dir=new THREE.DirectionalLight(0xffffff,0.8); dir.position.set(10,20,10); scene.add(dir);
@@ -394,7 +416,6 @@ function update3D(){
   const cx = site.w/2, cz = site.h/2;
   const inset = getInset();
 
-  // 바닥판 (이격 내부)
   {
     const slabGeo = new THREE.BoxGeometry(inset.w, 0.05, inset.h);
     const slabMat = new THREE.MeshLambertMaterial({color:0xf0f0f0});
@@ -408,7 +429,6 @@ function update3D(){
     scene.add(line);
   }
 
-  // 블록
   floors.forEach((fl, fi)=>{
     const y0 = fi*floorH;
     fl.blocks.forEach(b=>{
