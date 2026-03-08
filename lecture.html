@@ -7,7 +7,12 @@
   <style>
     :root{--bg:#0b0f14;--text:#e8eef6;--muted:#9fb0c4;--line:#1b2a3a}
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;
+    }
     a{color:inherit;text-decoration:none}
     .wrap{max-width:980px;margin:0 auto;padding:34px 18px 70px}
     header{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-end}
@@ -30,12 +35,27 @@
 
     .links{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
     .linkbtn{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:12px;border:1px solid var(--line);
-      background:rgba(255,255,255,.03);font-size:12px;color:var(--text)
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:12px;
+      color:var(--text)
     }
     .linkbtn:hover{background:rgba(255,255,255,.06)}
-    footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:11px;
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:10px
+    }
   </style>
 </head>
 <body>
@@ -43,7 +63,7 @@
     <header>
       <div>
         <div class="h1">Lecture / Audio on YouTube</div>
-        <div class="sub">샘플 강의는 유튜브(미등록)로 게시합니다.</div>
+        <div class="sub">전체 강의는 유튜브로 게시합니다.</div>
       </div>
       <div class="nav">
         <a class="btn" href="index.html">Cover</a>
@@ -60,7 +80,7 @@
       <div class="item">
         <div class="it">
           <div>
-            <div style="font-size:13px;font-weight:700;">Sample 01 — Lecture</div>
+            <div style="font-size:13px;font-weight:700;">Building Equipment — Lecture</div>
             <div class="muted">YouTube embed</div>
           </div>
           <span class="tag">youtube</span>
@@ -69,7 +89,7 @@
         <div class="frame">
           <iframe
             src="https://www.youtube.com/embed/zQLiIrE0L6k?rel=0"
-            title="Lecture Sample 01"
+            title="Building Equipment Lecture 01"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen>
           </iframe>
@@ -79,7 +99,35 @@
           <a class="linkbtn" href="https://youtu.be/zQLiIrE0L6k" target="_blank" rel="noopener">
             ▶ Watch on YouTube
           </a>
-          <a class="linkbtn" href="https://youtube.com/@nobody1437?si=@nobody1437" target="_blank" rel="noopener">
+          <a class="linkbtn" href="https://www.youtube.com/@nobody1437" target="_blank" rel="noopener">
+            Visit YouTube Channel →
+          </a>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="it">
+          <div>
+            <div style="font-size:13px;font-weight:700;">Architectural Engineering and AI — Lecture</div>
+            <div class="muted">YouTube embed</div>
+          </div>
+          <span class="tag">youtube</span>
+        </div>
+
+        <div class="frame">
+          <iframe
+            src="https://www.youtube.com/embed/VTO5WHE51B8?rel=0"
+            title="The Architect’s New Toolbox: AI"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="links">
+          <a class="linkbtn" href="https://youtu.be/VTO5WHE51B8" target="_blank" rel="noopener">
+            ▶ Watch on YouTube
+          </a>
+          <a class="linkbtn" href="https://www.youtube.com/@nobody1437" target="_blank" rel="noopener">
             Visit YouTube Channel →
           </a>
         </div>
