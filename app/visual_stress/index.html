@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>빛환경 간이 분석 도구</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121933;
+      --panel2:#182247;
+      --text:#e8ecf8;
+      --muted:#9aa6c5;
+      --line:#2b396d;
+      --accent:#7aa2ff;
+      --good:#2fbf71;
+      --warn:#ffb020;
+      --bad:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1020 0%,#0e1530 100%);
+      color:var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:24px 16px 60px;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:28px;
+      line-height:1.25;
+    }
+    .sub{
+      margin:0 0 22px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      gap:18px;
+    }
+    .card{
+      background:rgba(18,25,51,0.95);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 18px 40px rgba(0,0,0,0.22);
+    }
+    .section-title{
+      margin:0 0 14px;
+      font-size:18px;
+    }
+    .label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 8px;
+    }
+    input[type="file"], select, input[type="text"]{
+      width:100%;
+      background:var(--panel2);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 12px;
+      font-size:14px;
+      outline:none;
+    }
+    input[type="range"]{
+      width:100%;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .stack > * + *{
+      margin-top:14px;
+    }
+    button{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      background:linear-gradient(135deg,#6d8fff 0%,#9b7cff 100%);
+      color:white;
+      font-weight:700;
+      padding:14px 16px;
+      font-size:15px;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+    }
+    button:hover{ transform:translateY(-1px); opacity:.96; }
+    button.secondary{
+      background:#26345f;
+      border:1px solid #3b4f8c;
+    }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+    .preview-wrap{
+      display:grid;
+      grid-template-columns: 1fr 280px;
+      gap:18px;
+      align-items:start;
+    }
+    .preview-box, .chart-box{
+      background:#0c132b;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    .preview-box img, .preview-box canvas{
+      width:100%;
+      display:block;
+      border-radius:12px;
+      background:#091022;
+    }
+    .mini-title{
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 8px;
+    }
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:16px;
+    }
+    .metric{
+      background:#0c132b;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+    }
+    .metric .k{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+    }
+    .metric .v{
+      font-size:24px;
+      font-weight:800;
+      letter-spacing:-0.02em;
+    }
+    .badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-right:6px;
+      margin-bottom:6px;
+    }
+    .good{ background:rgba(47,191,113,0.15); color:#77e3a5; border:1px solid rgba(47,191,113,0.32);}
+    .warn{ background:rgba(255,176,32,0.14); color:#ffd27a; border:1px solid rgba(255,176,32,0.32);}
+    .bad{ background:rgba(255,107,107,0.14); color:#ff9e9e; border:1px solid rgba(255,107,107,0.32);}
+    .results{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+    .result-box{
+      background:#0c132b;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+    .result-box h3{
+      margin:0 0 12px;
+      font-size:16px;
+    }
+    ul{
+      margin:0;
+      padding-left:18px;
+      line-height:1.7;
+      color:#dce3f8;
+    }
+    .summary{
+      line-height:1.7;
+      color:#dce3f8;
+      white-space:pre-line;
+    }
+    .footer-note{
+      margin-top:18px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    canvas#histCanvas{
+      width:100%;
+      height:180px;
+      border-radius:12px;
+      background:#091022;
+      display:block;
+    }
+    .score-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .score-box{
+      min-width:120px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:#0c132b;
+      border:1px solid var(--line);
+      text-align:center;
+    }
+    .score-box .n{
+      font-size:28px;
+      font-weight:800;
+    }
+    .score-box .t{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+    }
+    .inline-value{
+      font-size:12px;
+      color:var(--muted);
+      text-align:right;
+      margin-top:4px;
+    }
+    @media (max-width: 960px){
+      .grid, .preview-wrap, .results{
+        grid-template-columns:1fr;
+      }
+      .metrics{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+    @media (max-width: 620px){
+      .metrics, .row{
+        grid-template-columns:1fr;
+      }
+      h1{font-size:24px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>빛환경 간이 분석 도구</h1>
+    <p class="sub">
+      업로드한 사진을 바탕으로 <strong>밝기 분포, 시각적 대비, 글레어(눈부심) 의심 패턴</strong>을 간이 분석합니다.
+      이 도구는 정밀 계측용이 아니라 <strong>시환경 스크리닝</strong> 목적입니다.
+    </p>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="section-title">입력</h2>
+        <div class="stack">
+          <div>
+            <label class="label" for="imageInput">사진 업로드</label>
+            <input id="imageInput" type="file" accept="image/*">
+          </div>
+
+          <div class="row">
+            <div>
+              <label class="label" for="spaceType">공간 유형</label>
+              <select id="spaceType">
+                <option value="general">일반 실내</option>
+                <option value="corridor">복도 / 통로</option>
+                <option value="reading">독서 / 작업 공간</option>
+                <option value="bedroom">침실 / 휴식 공간</option>
+                <option value="elderly">고령자 사용 공간</option>
+              </select>
+            </div>
+            <div>
+              <label class="label" for="viewDirection">시선 방향</label>
+              <select id="viewDirection">
+                <option value="front">정면 촬영</option>
+                <option value="window">창 방향 촬영</option>
+                <option value="light">조명 방향 촬영</option>
+                <option value="floor">바닥 / 통로 중심</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="label" for="sensitivity">글레어 민감도 조정</label>
+            <input id="sensitivity" type="range" min="0" max="100" value="50">
+            <div class="inline-value"><span id="sensValue">50</span> / 100</div>
+          </div>
+
+          <div>
+            <button id="analyzeBtn">분석 실행</button>
+          </div>
+
+          <div>
+            <button id="sampleBtn" class="secondary">샘플 이미지로 확인</button>
+          </div>
+
+          <div class="hint">
+            권장: 실내 전경이 잘 보이도록 촬영하고, 흔들림이 적은 이미지를 사용하세요.
+            역광 장면, 창 방향, 조명 방향 사진은 글레어 의심 탐지에 더 유리합니다.
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">미리보기 및 분석</h2>
+        <div class="preview-wrap">
+          <div class="preview-box">
+            <div class="mini-title">원본 이미지</div>
+            <img id="previewImage" alt="업로드한 이미지 미리보기" />
+          </div>
+          <div class="chart-box">
+            <div class="mini-title">밝기 히스토그램</div>
+            <canvas id="histCanvas" width="260" height="180"></canvas>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">평균 밝기</div>
+            <div class="v" id="mMean">-</div>
+          </div>
+          <div class="metric">
+            <div class="k">대비 지수</div>
+            <div class="v" id="mContrast">-</div>
+          </div>
+          <div class="metric">
+            <div class="k">글레어 의심 지수</div>
+            <div class="v" id="mGlare">-</div>
+          </div>
+          <div class="metric">
+            <div class="k">암부 비율</div>
+            <div class="v" id="mDark">-</div>
+          </div>
+          <div class="metric">
+            <div class="k">과휘도 비율</div>
+            <div class="v" id="mBright">-</div>
+          </div>
+          <div class="metric">
+            <div class="k">상하 편차</div>
+            <div class="v" id="mTB">-</div>
+          </div>
+        </div>
+
+        <div class="score-wrap">
+          <div class="score-box">
+            <div class="n" id="scoreValue">-</div>
+            <div class="t">종합 스코어</div>
+          </div>
+          <div id="badges"></div>
+        </div>
+
+        <div class="results">
+          <div class="result-box">
+            <h3>해석 요약</h3>
+            <div class="summary" id="summaryText">이미지를 업로드한 뒤 분석을 실행하세요.</div>
+          </div>
+          <div class="result-box">
+            <h3>개선 제안</h3>
+            <ul id="adviceList">
+              <li>아직 분석 결과가 없습니다.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          ※ 본 결과는 이미지 기반 간이 분석입니다. 실제 조도, UGR, 휘도, 시각 피로를 정밀하게 대체하지 않습니다.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <canvas id="workCanvas" width="800" height="600" hidden></canvas>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const previewImage = document.getElementById('previewImage');
+    const workCanvas = document.getElementById('workCanvas');
+    const histCanvas = document.getElementById('histCanvas');
+    const sensSlider = document.getElementById('sensitivity');
+    const sensValue = document.getElementById('sensValue');
+
+    sensSlider.addEventListener('input', () => {
+      sensValue.textContent = sensSlider.value;
+    });
+
+    const state = {
+      imageLoaded: false
+    };
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImage.src = reader.result;
+        previewImage.onload = () => {
+          state.imageLoaded = true;
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    sampleBtn.addEventListener('click', async () => {
+      const sample = generateSampleImage();
+      previewImage.src = sample;
+      previewImage.onload = () => {
+        state.imageLoaded = true;
+      };
+    });
+
+    analyzeBtn.addEventListener('click', () => {
+      if (!state.imageLoaded || !previewImage.src) {
+        alert('먼저 이미지를 업로드해주세요.');
+        return;
+      }
+      analyzeImage(previewImage);
+    });
+
+    function analyzeImage(img) {
+      const ctx = workCanvas.getContext('2d', { willReadFrequently: true });
+      const maxW = 900;
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      const w = Math.max(100, Math.round(img.naturalWidth * scale));
+      const h = Math.max(100, Math.round(img.naturalHeight * scale));
+      workCanvas.width = w;
+      workCanvas.height = h;
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const data = imgData.data;
+
+      const gray = new Float32Array(w * h);
+      const hist = new Array(256).fill(0);
+
+      let sum = 0;
+      let sumSq = 0;
+      let darkCount = 0;
+      let brightCount = 0;
+
+      const gridCols = 3;
+      const gridRows = 3;
+      const gridSums = Array.from({ length: gridRows }, () => Array(gridCols).fill(0));
+      const gridCounts = Array.from({ length: gridRows }, () => Array(gridCols).fill(0));
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+
+          const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          gray[y * w + x] = lum;
+
+          const v = Math.max(0, Math.min(255, Math.round(lum)));
+          hist[v] += 1;
+          sum += lum;
+          sumSq += lum * lum;
+
+          if (lum < 55) darkCount += 1;
+          if (lum > 235) brightCount += 1;
+
+          const gx = Math.min(gridCols - 1, Math.floor(x / (w / gridCols)));
+          const gy = Math.min(gridRows - 1, Math.floor(y / (h / gridRows)));
+          gridSums[gy][gx] += lum;
+          gridCounts[gy][gx] += 1;
+        }
+      }
+
+      const pixelCount = w * h;
+      const mean = sum / pixelCount;
+      const variance = Math.max(0, sumSq / pixelCount - mean * mean);
+      const std = Math.sqrt(variance);
+
+      const darkRatio = darkCount / pixelCount;
+      const brightRatio = brightCount / pixelCount;
+
+      const topMean = regionMean(gray, w, h, 0, 0, w, Math.floor(h / 3));
+      const midMean = regionMean(gray, w, h, 0, Math.floor(h / 3), w, Math.floor(h / 3));
+      const bottomMean = regionMean(gray, w, h, 0, Math.floor(h * 2 / 3), w, h - Math.floor(h * 2 / 3));
+      const leftMean = regionMean(gray, w, h, 0, 0, Math.floor(w / 3), h);
+      const centerMean = regionMean(gray, w, h, Math.floor(w / 3), 0, Math.floor(w / 3), h);
+      const rightMean = regionMean(gray, w, h, Math.floor(w * 2 / 3), 0, w - Math.floor(w * 2 / 3), h);
+
+      const tbDiff = topMean - bottomMean;
+      const lrDiff = leftMean - rightMean;
+      const contrastIndex = clamp((std / 64) * 100, 0, 100);
+
+      const brightSpots = detectBrightSpots(gray, w, h, 242);
+      const largestBrightSpotRatio = brightSpots.maxArea / pixelCount;
+      const topHeavyBrightRatio = brightSpots.topArea / Math.max(1, brightSpots.totalArea);
+
+      const sensitivity = Number(sensSlider.value) / 100;
+      let glareScore =
+        (brightRatio * 210) +
+        (largestBrightSpotRatio * 260) +
+        (Math.max(0, tbDiff) / 255 * 28) +
+        (std / 255 * 22) +
+        (topHeavyBrightRatio * 18) +
+        (sensitivity * 8);
+
+      const viewDirection = document.getElementById('viewDirection').value;
+      if (viewDirection === 'window' || viewDirection === 'light') glareScore += 8;
+      glareScore = clamp(glareScore, 0, 100);
+
+      const floorMean = bottomMean;
+      const floorVisibilityRisk = clamp(((90 - floorMean) / 90) * 100, 0, 100);
+
+      const spaceType = document.getElementById('spaceType').value;
+      let weightedScore =
+        (contrastIndex * 0.34) +
+        ((100 - glareScore) * 0.33) +
+        ((100 - floorVisibilityRisk) * 0.18) +
+        ((100 - darkRatio * 100) * 0.15);
+
+      if (spaceType === 'elderly') weightedScore -= glareScore * 0.07 + floorVisibilityRisk * 0.07;
+      if (spaceType === 'corridor') weightedScore -= floorVisibilityRisk * 0.08;
+      if (spaceType === 'reading') weightedScore -= Math.abs(mean - 150) * 0.06;
+      weightedScore = clamp(weightedScore, 0, 100);
+
+      updateMetrics({
+        mean, contrastIndex, glareScore, darkRatio, brightRatio, tbDiff, weightedScore
+      });
+      drawHistogram(hist);
+      renderResults({
+        mean, std, darkRatio, brightRatio, tbDiff, lrDiff,
+        contrastIndex, glareScore, floorVisibilityRisk, weightedScore,
+        topMean, midMean, bottomMean, leftMean, centerMean, rightMean,
+        brightSpots
+      });
+    }
+
+    function regionMean(gray, w, h, sx, sy, rw, rh) {
+      let sum = 0;
+      let count = 0;
+      const ex = Math.min(w, sx + rw);
+      const ey = Math.min(h, sy + rh);
+      for (let y = sy; y < ey; y++) {
+        for (let x = sx; x < ex; x++) {
+          sum += gray[y * w + x];
+          count += 1;
+        }
+      }
+      return count ? sum / count : 0;
+    }
+
+    function detectBrightSpots(gray, w, h, threshold) {
+      const visited = new Uint8Array(w * h);
+      let maxArea = 0;
+      let totalArea = 0;
+      let topArea = 0;
+      const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = y * w + x;
+          if (visited[idx] || gray[idx] < threshold) continue;
+
+          let area = 0;
+          const queue = [idx];
+          visited[idx] = 1;
+
+          while (queue.length) {
+            const cur = queue.pop();
+            area += 1;
+            const cy = Math.floor(cur / w);
+            const cx = cur % w;
+            if (cy < h / 3) topArea += 1;
+            for (const [dx, dy] of dirs) {
+              const nx = cx + dx;
+              const ny = cy + dy;
+              if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+              const ni = ny * w + nx;
+              if (visited[ni] || gray[ni] < threshold) continue;
+              visited[ni] = 1;
+              queue.push(ni);
+            }
+          }
+
+          totalArea += area;
+          if (area > maxArea) maxArea = area;
+        }
+      }
+      return { maxArea, totalArea, topArea };
+    }
+
+    function updateMetrics(m) {
+      document.getElementById('mMean').textContent = m.mean.toFixed(1);
+      document.getElementById('mContrast').textContent = m.contrastIndex.toFixed(0);
+      document.getElementById('mGlare').textContent = m.glareScore.toFixed(0);
+      document.getElementById('mDark').textContent = (m.darkRatio * 100).toFixed(1) + '%';
+      document.getElementById('mBright').textContent = (m.brightRatio * 100).toFixed(1) + '%';
+      document.getElementById('mTB').textContent = Math.abs(m.tbDiff).toFixed(1);
+      document.getElementById('scoreValue').textContent = m.weightedScore.toFixed(0);
+    }
+
+    function renderResults(m) {
+      const badges = [];
+      const advice = [];
+      const summary = [];
+
+      if (m.darkRatio > 0.33) {
+        badges.push(badgeHTML('암부 비율 높음', 'bad'));
+        summary.push('전반적인 암부 비율이 높아 시인성 저하 가능성이 있습니다.');
+        advice.push('통로, 바닥, 작업면 주변의 국부 조명을 보강하세요.');
+      } else if (m.darkRatio > 0.2) {
+        badges.push(badgeHTML('암부 일부 존재', 'warn'));
+        summary.push('어두운 구간이 일부 존재합니다.');
+        advice.push('활동이 많은 영역의 밝기 균형을 점검하세요.');
+      } else {
+        badges.push(badgeHTML('암부 양호', 'good'));
+      }
+
+      if (m.glareScore >= 70) {
+        badges.push(badgeHTML('글레어 의심 높음', 'bad'));
+        summary.push('강한 고휘도 영역과 주변 대비 차가 커서 글레어 위험이 높습니다.');
+        advice.push('창 차양, 커튼, 확산 조명, 광원 차폐를 검토하세요.');
+      } else if (m.glareScore >= 45) {
+        badges.push(badgeHTML('글레어 의심 보통', 'warn'));
+        summary.push('역광 또는 점광원에 의한 눈부심 가능성이 있습니다.');
+        advice.push('광원의 직접 노출을 줄이고 시선 방향을 조정하세요.');
+      } else {
+        badges.push(badgeHTML('글레어 의심 낮음', 'good'));
+      }
+
+      if (m.contrastIndex < 28) {
+        badges.push(badgeHTML('대비 낮음', 'bad'));
+        summary.push('공간 내 명암 구분이 약해 경계 식별이 어려울 수 있습니다.');
+        advice.push('바닥-벽, 문턱, 손잡이, 가구 경계의 대비를 높이세요.');
+      } else if (m.contrastIndex < 45) {
+        badges.push(badgeHTML('대비 보통', 'warn'));
+        summary.push('대비가 아주 낮지는 않지만 일부 영역의 식별성이 떨어질 수 있습니다.');
+        advice.push('핵심 동선과 작업 영역에 색상 또는 조명 대비를 추가하세요.');
+      } else {
+        badges.push(badgeHTML('대비 양호', 'good'));
+      }
+
+      if (m.tbDiff > 35) {
+        badges.push(badgeHTML('상부 과휘도', 'warn'));
+        summary.push('상부가 하부보다 훨씬 밝아 역광 패턴이 의심됩니다.');
+        advice.push('창면 또는 상부 광원의 밝기 완화가 필요할 수 있습니다.');
+      } else if (m.tbDiff < -35) {
+        badges.push(badgeHTML('하부 상대적 고휘도', 'warn'));
+        summary.push('하부가 상부보다 밝아 반사성 바닥 또는 국부 조명 영향이 있을 수 있습니다.');
+        advice.push('반사면 하이라이트와 바닥 눈부심을 점검하세요.');
+      }
+
+      if (Math.abs(m.lrDiff) > 30) {
+        badges.push(badgeHTML('좌우 불균형', 'warn'));
+        summary.push('좌우 밝기 편차가 커서 조명 분포가 한쪽으로 치우친 경향이 있습니다.');
+        advice.push('조명 배치를 분산하거나 국부 편중을 줄이세요.');
+      }
+
+      if (m.floorVisibilityRisk > 55) {
+        badges.push(badgeHTML('하부 시인성 저하', 'bad'));
+        summary.push('하부 영역이 어두워 이동 안전성에 불리할 수 있습니다.');
+        advice.push('야간 이동 동선, 침대 주변, 복도 하부 조명을 우선 보강하세요.');
+      }
+
+      if (advice.length === 0) {
+        advice.push('현재 이미지 기준으로는 큰 문제 패턴이 두드러지지 않습니다.');
+      }
+      if (summary.length === 0) {
+        summary.push('밝기 분포와 대비가 대체로 무난한 편입니다.');
+      }
+
+      summary.push('\n종합 스코어가 높을수록 현재 장면의 빛환경이 상대적으로 안정적이라는 뜻입니다.');
+
+      document.getElementById('badges').innerHTML = badges.join('');
+      document.getElementById('summaryText').textContent = summary.join(' ');
+      document.getElementById('adviceList').innerHTML = advice.map(v => `<li>${escapeHtml(v)}</li>`).join('');
+    }
+
+    function drawHistogram(hist) {
+      const c = histCanvas;
+      const ctx = c.getContext('2d');
+      const w = c.width;
+      const h = c.height;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.fillStyle = '#091022';
+      ctx.fillRect(0, 0, w, h);
+
+      const maxVal = Math.max(...hist, 1);
+      const barW = w / hist.length;
+
+      for (let i = 0; i < hist.length; i++) {
+        const bh = (hist[i] / maxVal) * (h - 18);
+        const g = i;
+        ctx.fillStyle = `rgb(${g},${g},${g})`;
+        ctx.fillRect(i * barW, h - bh - 1, Math.max(1, barW), bh);
+      }
+
+      ctx.strokeStyle = 'rgba(122,162,255,0.7)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 0.5);
+      ctx.lineTo(w, h - 0.5);
+      ctx.stroke();
+    }
+
+    function badgeHTML(text, kind) {
+      return `<span class="badge ${kind}">${escapeHtml(text)}</span>`;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function generateSampleImage() {
+      const c = document.createElement('canvas');
+      c.width = 1280;
+      c.height = 800;
+      const ctx = c.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 0, c.height);
+      grad.addColorStop(0, '#f8f7e8');
+      grad.addColorStop(0.38, '#d8d0bc');
+      grad.addColorStop(1, '#383838');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(780, 80, 360, 240);
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.fillRect(820, 110, 280, 180);
+
+      ctx.fillStyle = '#2e2e2e';
+      ctx.fillRect(0, 540, c.width, 260);
+
+      ctx.fillStyle = '#555';
+      ctx.fillRect(110, 390, 260, 120);
+      ctx.fillStyle = '#777';
+      ctx.fillRect(450, 420, 200, 70);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.96)';
+      ctx.beginPath();
+      ctx.arc(260, 120, 46, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.fillRect(200, 104, 120, 22);
+
+      return c.toDataURL('image/png');
+    }
+  </script>
+</body>
+</html>
