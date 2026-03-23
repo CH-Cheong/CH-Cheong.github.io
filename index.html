@@ -6,42 +6,230 @@
   <title>CH Cheong</title>
   <meta name="description" content="AI-driven Sustainable Building Environment Research." />
   <style>
-    :root{--bg:#0b0f14;--text:#e8eef6;--muted:#9fb0c4;--line:#1b2a3a}
+    :root{
+      --bg:#0b0f14;
+      --text:#e8eef6;
+      --muted:#9fb0c4;
+      --line:#1b2a3a;
+      --panel:rgba(255,255,255,.02);
+      --panel-hover:rgba(255,255,255,.04);
+    }
+
     *{box-sizing:border-box}
+
     body{
-      margin:0; height:100vh; display:grid; place-items:center;
-      background:var(--bg); color:var(--text);
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:var(--bg);
+      color:var(--text);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Noto Sans KR", monospace;
     }
-    .wrap{width:min(880px, 92vw); padding:28px}
+
+    .wrap{
+      width:min(880px, 92vw);
+      padding:28px;
+    }
+
     .frame{
-      border:1px solid var(--line); border-radius:16px;
-      padding:26px 22px; background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:26px 22px;
+      background:var(--panel);
     }
-    .top{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap}
-    .name{font-size:20px; font-weight:800; letter-spacing:.2px}
-    .meta{color:var(--muted); font-size:12px}
-    .line{height:1px; background:var(--line); margin:18px 0}
-    .tag{color:var(--muted); font-size:13px; line-height:1.7}
-    .tag b{color:var(--text); font-weight:700}
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      align-items:flex-start;
+    }
+
+    .name{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    .meta{
+      color:var(--muted);
+      font-size:12px;
+      text-align:right;
+    }
+
+    .line{
+      height:1px;
+      background:var(--line);
+      margin:18px 0;
+    }
+
+    .tag{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .tag b{
+      color:var(--text);
+      font-weight:700;
+    }
+
     .enter{
-      display:inline-flex; align-items:center; gap:10px;
-      margin-top:18px; padding:10px 12px; border-radius:12px;
-      border:1px solid var(--line); color:var(--text); text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      margin-top:18px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      color:var(--text);
+      text-decoration:none;
       background:rgba(255,255,255,.03);
+      transition:background .15s ease, transform .15s ease;
     }
-    .enter:hover{background:rgba(255,255,255,.06)}
+
+    .enter:hover{
+      background:rgba(255,255,255,.06);
+      transform:translateY(-1px);
+    }
+
     .secondary{
-      display:inline-flex; align-items:center;
-      margin-top:10px; padding:8px 12px;
+      display:inline-flex;
+      align-items:center;
+      margin-top:10px;
+      padding:8px 12px;
       border-radius:12px;
       border:1px solid var(--line);
       font-size:12px;
       color:var(--muted);
       text-decoration:none;
       background:rgba(255,255,255,.02);
+      transition:background .15s ease, color .15s ease, transform .15s ease;
     }
-    .secondary:hover{background:rgba(255,255,255,.05)}
+
+    .secondary:hover{
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      transform:translateY(-1px);
+    }
+
+    /* News */
+    .news{
+      margin-top:22px;
+      padding-top:4px;
+    }
+
+    .news-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .news-title{
+      font-size:13px;
+      font-weight:700;
+      color:var(--text);
+      letter-spacing:.2px;
+    }
+
+    .news-sub{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .news-board{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .news-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:9px 10px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:rgba(255,255,255,.015);
+    }
+
+    .news-item:hover{
+      background:var(--panel-hover);
+    }
+
+    .news-text{
+      min-width:0;
+      flex:1;
+      font-size:12px;
+      line-height:1.5;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .news-link{
+      flex-shrink:0;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 10px;
+      border-radius:9px;
+      border:1px solid var(--line);
+      font-size:11px;
+      color:var(--text);
+      text-decoration:none;
+      background:rgba(255,255,255,.03);
+      transition:background .15s ease, transform .15s ease;
+    }
+
+    .news-link:hover{
+      background:rgba(255,255,255,.07);
+      transform:translateY(-1px);
+    }
+
+    .news-empty,
+    .news-error,
+    .news-loading{
+      font-size:12px;
+      color:var(--muted);
+      padding:10px 2px 2px;
+    }
+
+    @media (max-width: 640px){
+      .frame{
+        padding:22px 16px;
+      }
+
+      .top{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .meta{
+        text-align:left;
+      }
+
+      .news-item{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .news-link{
+        width:auto;
+      }
+
+      .news-text{
+        white-space:normal;
+        overflow:visible;
+        text-overflow:unset;
+      }
+    }
   </style>
 </head>
 <body>
@@ -70,11 +258,104 @@
       </a>
       <br/>
 
-     <a class="secondary" href="apps.html">
+      <a class="secondary" href="apps.html">
         Online Apps
       </a>
-      
+
+      <div class="line"></div>
+
+      <section class="news" aria-labelledby="news-title">
+        <div class="news-header">
+          <div class="news-title" id="news-title">News</div>
+          <div class="news-sub">Latest 5 items</div>
+        </div>
+
+        <div class="news-board" id="news-board">
+          <div class="news-loading">Loading news...</div>
+        </div>
+      </section>
     </div>
   </div>
+
+  <script>
+    async function loadNews() {
+      const board = document.getElementById("news-board");
+      const newsPath = "data/News.txt";
+
+      try {
+        const response = await fetch(newsPath, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error("News.txt fetch failed");
+        }
+
+        const text = await response.text();
+
+        const lines = text
+          .split(/\r?\n/)
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .slice(0, 5);
+
+        if (lines.length === 0) {
+          board.innerHTML = '<div class="news-empty">No news available.</div>';
+          return;
+        }
+
+        const items = lines.map(line => {
+          const lastCommaIndex = line.lastIndexOf(",");
+
+          if (lastCommaIndex === -1) {
+            return {
+              title: line,
+              url: "#"
+            };
+          }
+
+          const title = line.slice(0, lastCommaIndex).trim();
+          const url = line.slice(lastCommaIndex + 1).trim();
+
+          return { title, url };
+        });
+
+        board.innerHTML = items.map(item => {
+          const safeTitle = escapeHtml(item.title || "Untitled");
+          const safeUrl = escapeAttribute(item.url || "#");
+
+          return `
+            <div class="news-item">
+              <div class="news-text" title="${safeTitle}">${safeTitle}</div>
+              <a class="news-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
+                View
+              </a>
+            </div>
+          `;
+        }).join("");
+      } catch (error) {
+        board.innerHTML = '<div class="news-error">Failed to load news.</div>';
+        console.error(error);
+      }
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttribute(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    loadNews();
+  </script>
 </body>
 </html>
