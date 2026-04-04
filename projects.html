@@ -14,7 +14,7 @@
     .h1{font-size:20px;font-weight:800}
     .sub{color:var(--muted);font-size:12px;line-height:1.6}
     .nav{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px}
+    .btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 10px;border-radius:12px;font-size:12px;cursor:pointer}
     .btn:hover{background:rgba(255,255,255,.06)}
     .card{border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:16px;padding:16px;margin-top:14px}
     h2{margin:0 0 10px;font-size:14px}
@@ -22,6 +22,65 @@
     .item{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:rgba(0,0,0,.10)}
     .it{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
     .tag{color:var(--muted);font-size:11px;border:1px solid var(--line);padding:2px 8px;border-radius:999px}
+
+    .thumb-wrap{margin-top:12px}
+    .thumb{
+      display:block;
+      width:100%;
+      max-width:420px;
+      height:auto;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#111;
+      cursor:pointer;
+    }
+    .thumb:hover{opacity:.92}
+    .mini-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.82);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:9999;
+    }
+    .modal.open{display:flex}
+    .modal-inner{
+      position:relative;
+      max-width:min(1200px, 96vw);
+      max-height:90vh;
+      width:auto;
+    }
+    .modal-img{
+      display:block;
+      max-width:100%;
+      max-height:90vh;
+      width:auto;
+      height:auto;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#111;
+      box-shadow:0 10px 40px rgba(0,0,0,.45);
+    }
+    .close-btn{
+      position:absolute;
+      top:-12px;
+      right:-12px;
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#111827;
+      color:var(--text);
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+    }
+    .close-btn:hover{background:#1f2937}
+
     footer{margin-top:18px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   </style>
 </head>
@@ -66,10 +125,79 @@
       </div>
     </section>
 
+    <section class="card">
+      <h2>[Research] Object detection on pedestrian walking paths for fall prevention</h2>
+      <div class="muted">
+        보행 동선 상의 장애물과 주변 객체를 영상 기반으로 탐지하여,
+        낙상 위험 가능성을 조기에 확인하기 위한 연구입니다.
+      </div>
+
+      <div class="thumb-wrap">
+        <img
+          class="thumb"
+          src="data/rnd_001.jpg"
+          alt="낙상 방지를 위한 보행자 경로 상 객체 인식 연구 이미지"
+          onclick="openImageModal('data/rnd_001.jpg', '낙상 방지를 위한 보행자 경로 상 객체 인식 연구 이미지')"
+        />
+        <div class="mini-actions">
+          <button
+            class="btn"
+            type="button"
+            onclick="openImageModal('data/rnd_001.jpg', '낙상 방지를 위한 보행자 경로 상 객체 인식 연구 이미지')"
+          >
+            View larger
+          </button>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="it"><div>Key points</div><span class="tag">research</span></div>
+        <div class="muted">- 보행 경로 상 객체 탐지 및 시각화</div>
+        <div class="muted">- 장애물 위치와 이동 경로의 중첩 확인</div>
+        <div class="muted">- 낙상 위험 환경의 조기 식별 가능성 검토</div>
+      </div>
+    </section>
+
     <footer>
       <div>© CH-Cheong</div>
       <div>Minimal disclosure · High trust</div>
     </footer>
   </div>
+
+  <div class="modal" id="imageModal" onclick="closeImageModal(event)">
+    <div class="modal-inner">
+      <button class="close-btn" type="button" onclick="forceCloseImageModal()" aria-label="닫기">×</button>
+      <img class="modal-img" id="modalImage" src="" alt="" />
+    </div>
+  </div>
+
+  <script>
+    function openImageModal(src, alt) {
+      const modal = document.getElementById('imageModal');
+      const img = document.getElementById('modalImage');
+      img.src = src;
+      img.alt = alt || 'expanded image';
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function forceCloseImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function closeImageModal(event) {
+      if (event.target.id === 'imageModal') {
+        forceCloseImageModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        forceCloseImageModal();
+      }
+    });
+  </script>
 </body>
 </html>
